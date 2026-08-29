@@ -1,0 +1,13 @@
+# This repository publishes only the website application. Resume source
+# materials and local working folders are intentionally excluded.
+*
+!.gitignore
+!index.html
+!package.json
+!pnpm-lock.yaml
+!src/
+!src/**
+!public/
+!public/**
+!.github/
+!.github/**
