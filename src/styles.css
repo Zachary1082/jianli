@@ -275,6 +275,100 @@
 .site .strength-card {
   background-clip: padding-box;
 }
+
+/*
+ * One responsive editorial grid for every screen. On ultra-wide displays the
+ * content stops growing at 1460px and only the outer breathing room expands.
+ */
+.site {
+  --content-width: 1460px;
+  --content-gutter: max(24px, calc((100vw - var(--content-width)) / 2));
+}
+
+.site .section {
+  width: 100%;
+  max-width: none;
+  padding-inline: var(--content-gutter);
+}
+
+.site .hero-v2 {
+  padding-inline: var(--content-gutter);
+}
+
+.site .nav:not(.nav-scrolled) {
+  padding-inline: var(--content-gutter);
+}
+
+.site .nav-scrolled {
+  width: min(calc(100% - 36px), 1580px);
+}
+
+.site .hero-v2 .candidate-card {
+  right: var(--content-gutter);
+}
+
+.site .hero-v2 .hero-meta {
+  right: calc(var(--content-gutter) + 300px);
+}
+
+.site .motion-chapter {
+  top: 64px;
+  left: var(--content-gutter);
+  width: var(--content-width);
+  max-width: calc(100vw - 48px);
+  font-size: clamp(64px, 8vw, 138px);
+}
+
+.site .section-label {
+  min-height: 18px;
+  margin-bottom: 90px;
+}
+
+/* Keep the opening composition at the same visual scale as later sections. */
+@media (min-width: 1800px) {
+  .site .hero-v2 .hero-copy {
+    max-width: 900px;
+  }
+
+  .site .hero-v2 .hero-copy h1 {
+    font-size: 142px;
+  }
+
+  .site .hero-v2 .hero-copy h1 em {
+    transform: translateX(150px);
+  }
+
+  .site .candidate-card {
+    width: 270px;
+  }
+}
+
+@media (min-width: 2400px) {
+  .site {
+    --content-width: 1580px;
+  }
+
+  .site .section {
+    padding-top: 150px;
+    padding-bottom: 150px;
+  }
+
+  .site .motion-chapter {
+    font-size: 138px;
+  }
+}
+
+@media (max-width: 800px) {
+  .site {
+    --content-gutter: 24px;
+  }
+
+  .site .motion-chapter {
+    top: 48px;
+    width: calc(100vw - 48px);
+    font-size: 18vw;
+  }
+}
 .hero-v2 .hero-motion-shell .hero-motion{position:absolute;inset:0 0 0 auto;width:55%;height:100%;object-fit:cover;object-position:59% center;opacity:1;clip-path:none;mask-image:none;mix-blend-mode:screen;transform:scale(1.34);transform-origin:62% center;filter:grayscale(.18) saturate(.76) contrast(1.08)}
 .hero-v2 .veil{z-index:0;background:linear-gradient(90deg,#07101d 0%,#07101df5 42%,#07101d9e 68%,#07101d52 100%),linear-gradient(0deg,#07101d 0%,transparent 34%)}
 .hero-v2 .candidate-card{display:block;z-index:2;right:clamp(44px,7vw,120px);bottom:12vh}
