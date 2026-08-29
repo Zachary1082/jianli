@@ -369,6 +369,90 @@
     font-size: 18vw;
   }
 }
+
+/* Restrained depth typography fills the hero's upper editorial field. */
+.site .hero-depth {
+  --depth-x: 0px;
+  --depth-y: 0px;
+  position: absolute;
+  z-index: 1;
+  top: clamp(92px, 11vh, 150px);
+  left: var(--content-gutter);
+  width: min(760px, 44vw);
+  height: 300px;
+  pointer-events: none;
+  perspective: 900px;
+  opacity: .82;
+}
+
+.site .hero-depth > span,
+.site .hero-depth > em {
+  position: absolute;
+  left: 0;
+  font: 700 11px/1 'DM Mono', monospace;
+  letter-spacing: .2em;
+  font-style: normal;
+}
+
+.site .hero-depth > span {
+  top: 0;
+  color: #e7cb96;
+}
+
+.site .hero-depth > em {
+  bottom: 5px;
+  color: #8da3c2;
+}
+
+.site .depth-stage {
+  position: absolute;
+  inset: 28px 0 30px;
+  display: flex;
+  align-items: center;
+  transform-style: preserve-3d;
+}
+
+.site .depth-stage strong {
+  position: relative;
+  display: block;
+  color: #e3c17f;
+  font: 800 clamp(82px, 6.5vw, 126px)/.78 Manrope, Arial, sans-serif;
+  letter-spacing: -.075em;
+  white-space: nowrap;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transform: translate3d(var(--depth-x), var(--depth-y), 0) rotateX(48deg) rotateZ(-3deg);
+  text-shadow:
+    2px 3px 0 #304a78,
+    4px 6px 0 #29426e,
+    6px 9px 0 #223861,
+    8px 12px 0 #1b3054,
+    10px 15px 0 #142844,
+    18px 28px 42px #020816b8;
+  transition: transform .85s cubic-bezier(.22,1,.36,1);
+}
+
+.site .depth-stage strong::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  -webkit-text-stroke: 1px #cbd9ec38;
+  transform: translate3d(14px, 22px, -30px);
+}
+
+@media (max-width: 1200px), (max-height: 820px) {
+  .site .hero-depth {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site .depth-stage strong {
+    transform: rotateX(48deg) rotateZ(-3deg);
+    transition: none;
+  }
+}
 .hero-v2 .hero-motion-shell .hero-motion{position:absolute;inset:0 0 0 auto;width:55%;height:100%;object-fit:cover;object-position:59% center;opacity:1;clip-path:none;mask-image:none;mix-blend-mode:screen;transform:scale(1.34);transform-origin:62% center;filter:grayscale(.18) saturate(.76) contrast(1.08)}
 .hero-v2 .veil{z-index:0;background:linear-gradient(90deg,#07101d 0%,#07101df5 42%,#07101d9e 68%,#07101d52 100%),linear-gradient(0deg,#07101d 0%,transparent 34%)}
 .hero-v2 .candidate-card{display:block;z-index:2;right:clamp(44px,7vw,120px);bottom:12vh}

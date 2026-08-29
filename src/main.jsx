@@ -125,6 +125,7 @@ function App() {
     const titleOffset = window.innerWidth > 1000 ? '11vw' : '0px';
     play(document.querySelector('.nav'), [{ opacity: 0, translate: '0 -42px' }, { opacity: 1, translate: '0 0' }], { duration: 1050, delay: 120, easing: ease });
     play(hero?.querySelector('.hero-motion-shell'), [{ opacity: 0, clipPath: 'polygon(92% 0,100% 0,100% 100%,84% 100%)' }, { opacity: .22, clipPath: 'polygon(67% 0,100% 0,100% 100%,45% 100%)' }], { duration: 1900, delay: 120, easing: ease });
+    play(hero?.querySelector('.hero-depth'), [{ opacity: 0, transform: 'translateY(-28px) scale(.94)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }], { duration: 1750, delay: 260, easing: ease });
     play(hero?.querySelector('.eyebrow'), [{ opacity: 0, transform: 'translateY(28px)', letterSpacing: '.32em' }, { opacity: 1, transform: 'translateY(0)', letterSpacing: '.13em' }], { duration: 1100, delay: 360, easing: ease });
     play(hero?.querySelector('h1 span'), [{ opacity: 0, clipPath: 'inset(0 0 100% 0)', transform: 'translateY(120px) scaleY(.62)' }, { opacity: 1, clipPath: 'inset(0 0 0% 0)', transform: 'translateY(0) scaleY(1)' }], { duration: 1550, delay: 420, easing: ease });
     play(hero?.querySelector('h1 em'), [{ opacity: 0, clipPath: 'inset(100% 0 0 0)', transform: `translateX(${titleOffset}) translateY(130px) scaleY(.58)` }, { opacity: 1, clipPath: 'inset(0% 0 0 0)', transform: `translateX(${titleOffset}) translateY(0) scaleY(1)` }], { duration: 1650, delay: 610, easing: ease });
@@ -197,9 +198,25 @@ function App() {
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(updateParallax); } };
     window.addEventListener('scroll', onScroll, { passive: true });
     updateParallax();
+
+    const depthText = hero?.querySelector('.hero-depth');
+    let depthFrame = 0;
+    const updateDepth = (event) => {
+      if (!depthText || depthFrame) return;
+      depthFrame = requestAnimationFrame(() => {
+        const x = (event.clientX / innerWidth - .5) * 2;
+        const y = (event.clientY / innerHeight - .5) * 2;
+        depthText.style.setProperty('--depth-x', `${x * 10}px`);
+        depthText.style.setProperty('--depth-y', `${y * 7}px`);
+        depthFrame = 0;
+      });
+    };
+    hero?.addEventListener('pointermove', updateDepth, { passive: true });
     return () => {
       observer.disconnect();
       window.removeEventListener('scroll', onScroll);
+      hero?.removeEventListener('pointermove', updateDepth);
+      if (depthFrame) cancelAnimationFrame(depthFrame);
       animations.forEach((animation) => animation.cancel());
     };
   }, []);
@@ -236,7 +253,7 @@ function App() {
       <button className="menu" aria-label="打开导航" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button>
       <nav className={open ? 'show' : ''}>
         {nav.map(([text, id]) => <a key={id} href={`#${id}`} onClick={() => setOpen(false)}>{text}</a>)}
-        <a className="nav-cta" href="mailto:zhangjunhao03@foxmail.com">联系我 <ArrowUpRight size={15} /></a>
+        <a className="nav-cta" href="#contact" onClick={() => setOpen(false)}>联系我 <ArrowUpRight size={15} /></a>
       </nav>
     </header>
 
@@ -249,6 +266,11 @@ function App() {
         </div>
         <div className="hero-grid" /><div className="hero-orbit orbit-one" /><div className="hero-orbit orbit-two" />
         <div className="veil" />
+        <div className="hero-depth" aria-hidden="true">
+          <span>FROM IDEA / 01</span>
+          <div className="depth-stage"><strong data-text="TO IMPACT">TO IMPACT</strong></div>
+          <em>BUILD · TEST · DELIVER</em>
+        </div>
         <div className="hero-copy">
           <p className="eyebrow">2027 GRADUATE · MANAGEMENT TRAINEE · ZHANG JUNHAO</p>
           <h1><span>让想法</span><br /><em>成为结果。</em></h1>
