@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#ff8a00" />
+  <title>高考择学通</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config={theme:{extend:{fontFamily:{sans:['-apple-system','BlinkMacSystemFont','SF Pro Display','SF Pro Text','PingFang SC','Helvetica Neue','Arial','sans-serif']}}}}
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="m-0 bg-[#e9eaed] font-sans text-slate-900 antialiased">
+  <style>
+    html, body { width: 100%; min-height: 100%; }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      box-sizing: border-box;
+    }
+    .iphone-stage {
+      width: 417px;
+      height: 876px;
+      position: relative;
+      flex: 0 0 auto;
+    }
+    .iphone-device {
+      width: 417px;
+      height: 876px;
+      position: relative;
+      border-radius: 58px;
+      padding: 12px;
+      box-sizing: border-box;
+      background: linear-gradient(145deg,#2b2b2d 0%,#050506 38%,#1c1c1e 72%,#050506 100%);
+      box-shadow:
+        0 30px 80px rgba(0,0,0,.28),
+        inset 0 0 0 1px rgba(255,255,255,.15),
+        inset 0 0 0 3px rgba(0,0,0,.8);
+    }
+    .iphone-screen {
+      width: 393px;
+      height: 852px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 47px;
+      background: #f7f8fa;
+      isolation: isolate;
+    }
+    #app {
+      width: 393px !important;
+      height: 852px !important;
+      min-height: 852px !important;
+      max-width: none !important;
+      overflow: hidden !important;
+      box-shadow: none !important;
+      border-radius: 47px;
+      position: relative;
+    }
+    #app .screen {
+      width: 100%;
+      height: 852px;
+      min-height: 852px !important;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #app .screen::-webkit-scrollbar { display: none; }
+    #tabbar {
+      position: absolute !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+      transform: none !important;
+      border-radius: 0 0 47px 47px;
+    }
+    [data-screen="ai"] .fixed {
+      position: absolute !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+      transform: none !important;
+    }
+    #toast {
+      position: absolute !important;
+      top: 54px !important;
+      left: 50% !important;
+      max-width: 330px !important;
+    }
+    .dynamic-island {
+      position: absolute;
+      z-index: 90;
+      top: 19px;
+      left: 50%;
+      width: 126px;
+      height: 37px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #050505;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.035);
+      pointer-events: none;
+    }
+    .dynamic-island::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%,#1f355f,#06080c 72%);
+      opacity: .85;
+    }
+    .speaker-detail {
+      position: absolute;
+      z-index: 91;
+      top: 24px;
+      left: 50%;
+      width: 48px;
+      height: 4px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #161616;
+      pointer-events: none;
+    }
+    .side-btn {
+      position: absolute;
+      background: linear-gradient(#39393b,#121214);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.1);
+    }
+    .side-btn.action { left: -3px; top: 144px; width: 4px; height: 36px; border-radius: 3px 0 0 3px; }
+    .side-btn.vol-up { left: -4px; top: 208px; width: 5px; height: 70px; border-radius: 4px 0 0 4px; }
+    .side-btn.vol-down { left: -4px; top: 292px; width: 5px; height: 70px; border-radius: 4px 0 0 4px; }
+    .side-btn.power { right: -4px; top: 228px; width: 5px; height: 106px; border-radius: 0 4px 4px 0; }
+    .home-indicator {
+      position: absolute;
+      z-index: 95;
+      bottom: 8px;
+      left: 50%;
+      width: 132px;
+      height: 5px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: rgba(10,10,10,.82);
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+    @media (max-width: 460px), (max-height: 930px) {
+      body { padding: 10px; }
+      .iphone-stage {
+        --scale: min(calc((100vw - 20px) / 417), calc((100vh - 20px) / 876));
+        width: calc(417px * var(--scale));
+        height: calc(876px * var(--scale));
+      }
+      .iphone-device {
+        transform: scale(var(--scale));
+        transform-origin: top left;
+      }
+    }
+  </style>
+
+  <div class="iphone-stage" aria-label="iPhone 15 Pro 高考择学通交互原型">
+    <div class="iphone-device">
+      <span class="side-btn action"></span>
+      <span class="side-btn vol-up"></span>
+      <span class="side-btn vol-down"></span>
+      <span class="side-btn power"></span>
+
+      <div class="iphone-screen">
+        <div class="dynamic-island"></div>
+        <div class="speaker-detail"></div>
+        <div class="home-indicator"></div>
+
+        <div id="app" class="bg-[#f7f8fa] relative overflow-x-hidden">
+
+    <!-- top safe area -->
+    <div class="h-[env(safe-area-inset-top)]"></div>
+
+    <!-- ONBOARDING -->
+    <section data-screen="onboarding" class="screen min-h-screen bg-white">
+      <div class="relative h-[46vh] min-h-[360px]">
+        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=85" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-white via-white/10 to-black/25"></div>
+        <div class="absolute top-5 left-5 rounded-full bg-white/90 backdrop-blur px-3 py-1.5 text-xs font-medium text-[#ff8a00]">高考择学通</div>
+      </div>
+      <div class="px-6 -mt-4 relative">
+        <div class="text-xs font-semibold tracking-wide text-[#ff8a00]">站在明天看今天</div>
+        <h1 class="mt-2 text-[32px] leading-[1.18] font-semibold tracking-tight">先看未来职业，<br>再决定今天的大学。</h1>
+        <p class="mt-4 text-[15px] leading-7 text-slate-500">职业测评、AI 趋势分析、专业匹配、院校推荐和冲稳保志愿方案，整合成一条完整规划路径。</p>
+        <div class="mt-7 grid grid-cols-3 gap-2">
+          <div class="rounded-2xl bg-orange-50 p-3 text-center"><i data-lucide="brain" class="w-5 h-5 mx-auto text-[#ff8a00]"></i><div class="mt-2 text-[11px]">职业测评</div></div>
+          <div class="rounded-2xl bg-blue-50 p-3 text-center"><i data-lucide="trending-up" class="w-5 h-5 mx-auto text-blue-500"></i><div class="mt-2 text-[11px]">AI趋势</div></div>
+          <div class="rounded-2xl bg-emerald-50 p-3 text-center"><i data-lucide="list-checks" class="w-5 h-5 mx-auto text-emerald-500"></i><div class="mt-2 text-[11px]">智能填报</div></div>
+        </div>
+        <button data-go="login" class="mt-8 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold shadow-lg shadow-orange-200">开始规划</button>
+        <button data-go="home" class="mt-3 mb-8 w-full py-3 text-sm text-slate-500">先体验一下</button>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section data-screen="login" class="screen hidden min-h-screen bg-white px-6 pt-12">
+      <button data-go="onboarding" class="w-10 h-10 rounded-full bg-slate-100 grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+      <div class="mt-10 text-sm font-semibold text-[#ff8a00]">高考择学通</div>
+      <h2 class="mt-2 text-3xl font-semibold">欢迎回来</h2>
+      <p class="mt-2 text-sm leading-6 text-slate-500">先选择身份，我们会据此调整推荐内容和表达方式。</p>
+      <div class="mt-7 grid grid-cols-2 gap-3" id="roleChooser">
+        <button data-role="student" class="role-btn rounded-3xl border-2 border-[#ff8a00] bg-orange-50 p-4 text-left">
+          <i data-lucide="graduation-cap" class="w-6 h-6 text-[#ff8a00]"></i>
+          <div class="mt-8 font-semibold">我是考生</div><div class="mt-1 text-xs text-slate-500">规划自己的未来</div>
+        </button>
+        <button data-role="parent" class="role-btn rounded-3xl border border-slate-200 bg-white p-4 text-left">
+          <i data-lucide="users" class="w-6 h-6 text-slate-600"></i>
+          <div class="mt-8 font-semibold">我是家长</div><div class="mt-1 text-xs text-slate-500">陪孩子一起决策</div>
+        </button>
+      </div>
+      <div class="mt-8 space-y-3">
+        <input id="phone" class="w-full rounded-2xl bg-slate-100 px-4 py-4 text-sm outline-none focus:ring-2 focus:ring-orange-200" placeholder="手机号">
+        <div class="flex gap-3">
+          <input class="flex-1 min-w-0 rounded-2xl bg-slate-100 px-4 py-4 text-sm outline-none focus:ring-2 focus:ring-orange-200" placeholder="验证码">
+          <button id="codeBtn" class="rounded-2xl bg-slate-900 px-4 text-sm text-white">获取验证码</button>
+        </div>
+      </div>
+      <button data-go="profile" class="mt-7 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold">登录并继续</button>
+      <div class="mt-4 text-center text-[11px] text-slate-400">登录即代表同意用户协议与隐私政策</div>
+    </section>
+
+    <!-- PROFILE SETUP -->
+    <section data-screen="profile" class="screen hidden min-h-screen bg-[#f7f8fa] px-5 pt-12 pb-8">
+      <div class="flex items-center gap-3">
+        <button data-go="login" class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+        <div><h2 class="text-xl font-semibold">建立升学档案</h2><div class="mt-1 text-xs text-slate-500">用于生成更准确的推荐</div></div>
+      </div>
+      <div class="mt-6 rounded-[28px] bg-white p-5 shadow-sm space-y-5">
+        <div>
+          <div class="text-xs text-slate-400 mb-2">高考省份</div>
+          <select id="province" class="w-full rounded-2xl bg-slate-50 px-4 py-4 text-sm outline-none">
+            <option>山东</option><option>广东</option><option>江苏</option><option>浙江</option><option>河南</option><option>四川</option>
+          </select>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-2">选科组合</div>
+          <div class="grid grid-cols-3 gap-2" id="subjectPicker">
+            <button class="subject active rounded-xl border border-orange-200 bg-orange-50 py-3 text-sm text-[#ff8a00]" data-subject="物理">物理</button>
+            <button class="subject active rounded-xl border border-orange-200 bg-orange-50 py-3 text-sm text-[#ff8a00]" data-subject="化学">化学</button>
+            <button class="subject active rounded-xl border border-orange-200 bg-orange-50 py-3 text-sm text-[#ff8a00]" data-subject="生物">生物</button>
+            <button class="subject rounded-xl border border-slate-200 py-3 text-sm text-slate-500" data-subject="历史">历史</button>
+            <button class="subject rounded-xl border border-slate-200 py-3 text-sm text-slate-500" data-subject="地理">地理</button>
+            <button class="subject rounded-xl border border-slate-200 py-3 text-sm text-slate-500" data-subject="政治">政治</button>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-2">预估 / 高考分数</div>
+          <input id="score" type="number" min="0" max="750" value="582" class="w-full rounded-2xl bg-slate-50 px-4 py-4 text-2xl font-semibold outline-none">
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-2">偏好城市</div>
+          <div class="flex flex-wrap gap-2" id="cityPicker">
+            <button class="city rounded-full bg-orange-50 text-[#ff8a00] px-3 py-2 text-xs" data-city="上海">上海</button>
+            <button class="city rounded-full bg-orange-50 text-[#ff8a00] px-3 py-2 text-xs" data-city="杭州">杭州</button>
+            <button class="city rounded-full bg-slate-100 px-3 py-2 text-xs" data-city="南京">南京</button>
+            <button class="city rounded-full bg-slate-100 px-3 py-2 text-xs" data-city="济南">济南</button>
+          </div>
+        </div>
+      </div>
+      <button id="saveProfile" class="mt-6 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold">完成建档</button>
+    </section>
+
+    <!-- HOME -->
+    <section data-screen="home" class="screen hidden min-h-screen pb-24">
+      <div class="px-5 pt-11">
+        <div class="flex items-center justify-between">
+          <div><div class="text-xs text-slate-400">下午好，<span id="helloName">张同学</span></div><div class="mt-1 text-xl font-semibold">距离志愿填报还有 <span class="text-[#ff8a00]">26 天</span></div></div>
+          <button class="w-10 h-10 rounded-full bg-white shadow-sm grid place-items-center"><i data-lucide="bell" class="w-5 h-5"></i></button>
+        </div>
+
+        <button data-go="search" class="mt-5 w-full rounded-2xl bg-white px-4 py-3 text-left text-sm text-slate-400 shadow-sm flex items-center gap-2"><i data-lucide="search" class="w-4 h-4"></i>搜索大学 / 专业 / 职业</button>
+
+        <div class="mt-5 rounded-[28px] bg-gradient-to-br from-[#ff8a00] to-[#ffb347] p-5 text-white shadow-lg shadow-orange-100">
+          <div class="flex justify-between items-start">
+            <div><div class="text-xs text-white/75">我的升学目标</div><div id="homeScore" class="mt-1 text-2xl font-semibold">582 分 · 山东</div><div class="mt-2 text-sm text-white/90">当前可匹配 286 所院校</div></div>
+            <span id="homeSubjects" class="rounded-full bg-white/20 px-3 py-1 text-xs">物化生</span>
+          </div>
+          <button data-go="volunteer" class="mt-5 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-[#ff8a00]">生成冲稳保方案</button>
+        </div>
+
+        <div class="mt-6 flex items-center justify-between"><h3 class="font-semibold">核心服务</h3><span class="text-xs text-slate-400">为你定制</span></div>
+        <div class="mt-3 grid grid-cols-4 gap-2">
+          <button data-go="assessment" class="rounded-2xl bg-white p-3 text-center shadow-sm"><div class="mx-auto w-10 h-10 rounded-xl bg-violet-50 grid place-items-center"><i data-lucide="brain-circuit" class="w-5 h-5 text-violet-500"></i></div><div class="mt-2 text-[11px] font-medium">职业测评</div></button>
+          <button data-go="trends" class="rounded-2xl bg-white p-3 text-center shadow-sm"><div class="mx-auto w-10 h-10 rounded-xl bg-blue-50 grid place-items-center"><i data-lucide="trending-up" class="w-5 h-5 text-blue-500"></i></div><div class="mt-2 text-[11px] font-medium">AI趋势</div></button>
+          <button data-go="universities" class="rounded-2xl bg-white p-3 text-center shadow-sm"><div class="mx-auto w-10 h-10 rounded-xl bg-emerald-50 grid place-items-center"><i data-lucide="school" class="w-5 h-5 text-emerald-500"></i></div><div class="mt-2 text-[11px] font-medium">查大学</div></button>
+          <button data-go="majors" class="rounded-2xl bg-white p-3 text-center shadow-sm"><div class="mx-auto w-10 h-10 rounded-xl bg-orange-50 grid place-items-center"><i data-lucide="book-open" class="w-5 h-5 text-[#ff8a00]"></i></div><div class="mt-2 text-[11px] font-medium">查专业</div></button>
+        </div>
+
+        <div class="mt-6 flex items-center justify-between"><h3 class="font-semibold">站在明天看今天</h3><button data-go="trends" class="text-xs text-[#ff8a00]">查看更多</button></div>
+        <div class="mt-3 grid grid-cols-2 gap-3">
+          <button data-go="career" class="rounded-2xl bg-white overflow-hidden shadow-sm text-left">
+            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=700&q=80" class="h-28 w-full object-cover" alt="">
+            <div class="p-3"><div class="text-[11px] text-slate-400">未来 5 年</div><div class="mt-1 text-sm font-semibold">人工智能工程师</div><div class="mt-2 text-[11px] text-emerald-600">趋势看涨 92%</div></div>
+          </button>
+          <button data-go="career" class="rounded-2xl bg-white overflow-hidden shadow-sm text-left">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=700&q=80" class="h-28 w-full object-cover" alt="">
+            <div class="p-3"><div class="text-[11px] text-slate-400">稳定方向</div><div class="mt-1 text-sm font-semibold">数据分析师</div><div class="mt-2 text-[11px] text-blue-600">匹配度 86%</div></div>
+          </button>
+        </div>
+
+        <button data-go="planner" class="mt-5 w-full rounded-[24px] bg-slate-900 p-5 text-left text-white flex items-center gap-4">
+          <div class="w-11 h-11 rounded-2xl bg-white/10 grid place-items-center"><i data-lucide="user-round-check" class="w-6 h-6"></i></div>
+          <div class="flex-1"><div class="font-semibold">1 对 1 志愿规划师</div><div class="mt-1 text-xs text-white/55">AI 先诊断，专家再做关键决策</div></div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-white/50"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SEARCH -->
+    <section data-screen="search" class="screen hidden min-h-screen bg-white px-5 pt-11 pb-8">
+      <div class="flex gap-3 items-center">
+        <button data-back class="w-10 h-10 grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+        <div class="flex-1 rounded-2xl bg-slate-100 px-4 py-3 flex items-center gap-2"><i data-lucide="search" class="w-4 h-4 text-slate-400"></i><input id="globalSearch" class="bg-transparent outline-none text-sm w-full" placeholder="搜索大学、专业、职业"></div>
+      </div>
+      <div class="mt-7 text-sm font-semibold">热门搜索</div>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <button class="search-tag rounded-full bg-orange-50 text-[#ff8a00] px-3 py-2 text-xs">计算机科学与技术</button>
+        <button class="search-tag rounded-full bg-slate-100 px-3 py-2 text-xs">山东大学</button>
+        <button class="search-tag rounded-full bg-slate-100 px-3 py-2 text-xs">人工智能</button>
+        <button class="search-tag rounded-full bg-slate-100 px-3 py-2 text-xs">公费师范生</button>
+      </div>
+      <div id="searchResults" class="mt-7 space-y-3">
+        <button data-go="career" class="w-full rounded-2xl border border-slate-100 p-4 flex gap-3 items-center text-left"><div class="w-11 h-11 rounded-xl bg-blue-50 grid place-items-center"><i data-lucide="cpu" class="w-5 h-5 text-blue-500"></i></div><div class="flex-1"><div class="text-sm font-semibold">人工智能工程师</div><div class="mt-1 text-xs text-slate-400">职业 · 未来趋势强</div></div><i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i></button>
+        <button data-go="majorDetail" class="w-full rounded-2xl border border-slate-100 p-4 flex gap-3 items-center text-left"><div class="w-11 h-11 rounded-xl bg-orange-50 grid place-items-center"><i data-lucide="book-open" class="w-5 h-5 text-[#ff8a00]"></i></div><div class="flex-1"><div class="text-sm font-semibold">计算机科学与技术</div><div class="mt-1 text-xs text-slate-400">专业 · 匹配度 91%</div></div><i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i></button>
+        <button data-go="universityDetail" class="w-full rounded-2xl border border-slate-100 p-4 flex gap-3 items-center text-left"><div class="w-11 h-11 rounded-xl bg-red-50 grid place-items-center font-bold text-red-600">山大</div><div class="flex-1"><div class="text-sm font-semibold">山东大学</div><div class="mt-1 text-xs text-slate-400">院校 · 985 / 211</div></div><i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i></button>
+      </div>
+    </section>
+
+    <!-- ASSESSMENT -->
+    <section data-screen="assessment" class="screen hidden min-h-screen bg-[#fff9f2] px-5 pt-11 pb-8">
+      <div class="flex items-center justify-between"><button data-back class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><span class="text-xs text-slate-400">约 3 分钟体验</span></div>
+      <div class="mt-7 rounded-[30px] bg-white p-6 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-violet-50 grid place-items-center"><i data-lucide="brain" class="w-7 h-7 text-violet-500"></i></div>
+        <h2 class="mt-5 text-2xl font-semibold">职业倾向测评</h2>
+        <p class="mt-2 text-sm leading-6 text-slate-500">基于性格、兴趣、能力偏好和职业价值观，生成职业方向与专业建议。</p>
+        <div class="mt-6 grid grid-cols-3 gap-2 text-center"><div class="rounded-2xl bg-slate-50 p-3"><div class="font-semibold">5</div><div class="text-[10px] text-slate-400 mt-1">体验题</div></div><div class="rounded-2xl bg-slate-50 p-3"><div class="font-semibold">4</div><div class="text-[10px] text-slate-400 mt-1">评估维度</div></div><div class="rounded-2xl bg-slate-50 p-3"><div class="font-semibold">1</div><div class="text-[10px] text-slate-400 mt-1">报告</div></div></div>
+      </div>
+      <div class="mt-5 rounded-[28px] bg-white p-5 shadow-sm">
+        <div class="text-sm font-semibold">你将获得</div>
+        <div class="mt-4 space-y-4 text-sm"><div class="flex gap-3"><span class="w-6 h-6 rounded-full bg-orange-50 grid place-items-center text-[#ff8a00] text-xs">1</span><div><div class="font-medium">职业性格画像</div><div class="text-xs text-slate-400 mt-1">识别适合你的工作方式</div></div></div><div class="flex gap-3"><span class="w-6 h-6 rounded-full bg-orange-50 grid place-items-center text-[#ff8a00] text-xs">2</span><div><div class="font-medium">行业方向</div><div class="text-xs text-slate-400 mt-1">结合未来趋势进行筛选</div></div></div><div class="flex gap-3"><span class="w-6 h-6 rounded-full bg-orange-50 grid place-items-center text-[#ff8a00] text-xs">3</span><div><div class="font-medium">专业与院校建议</div><div class="text-xs text-slate-400 mt-1">将未来职业映射回当下选择</div></div></div></div>
+      </div>
+      <button id="startQuiz" class="mt-6 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold">开始测评</button>
+    </section>
+
+    <!-- QUIZ -->
+    <section data-screen="quiz" class="screen hidden min-h-screen bg-white px-6 pt-11 pb-8">
+      <div class="flex justify-between items-center"><button id="quitQuiz" class="w-10 h-10 grid place-items-center"><i data-lucide="x" class="w-5 h-5"></i></button><div id="quizProgressText" class="text-xs text-slate-400">1 / 5</div></div>
+      <div class="mt-4 h-2 rounded-full bg-slate-100 overflow-hidden"><div id="quizBar" class="h-full bg-[#ff8a00] rounded-full transition-all" style="width:20%"></div></div>
+      <div id="quizCategory" class="mt-12 text-xs font-semibold text-[#ff8a00]">兴趣偏好</div>
+      <h2 id="quizQuestion" class="mt-3 text-2xl font-semibold leading-relaxed"></h2>
+      <div id="quizOptions" class="mt-8 space-y-3"></div>
+      <div class="mt-5 text-center text-xs text-slate-400">答案没有对错，请选择最接近真实自己的选项</div>
+    </section>
+
+    <!-- RESULT -->
+    <section data-screen="result" class="screen hidden min-h-screen bg-[#f7f8fa] pb-8">
+      <div class="bg-gradient-to-br from-violet-500 to-indigo-600 px-5 pt-11 pb-14 text-white">
+        <div class="flex justify-between"><button data-back class="w-10 h-10 rounded-full bg-white/15 grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><button class="w-10 h-10 rounded-full bg-white/15 grid place-items-center"><i data-lucide="share-2" class="w-5 h-5"></i></button></div>
+        <div class="mt-8 text-xs text-white/70">你的职业性格</div><div class="mt-1 text-4xl font-bold">ENTJ · 指挥官</div><div class="mt-2 text-sm text-white/85">理性决策 · 目标导向 · 擅长组织与资源整合</div>
+      </div>
+      <div class="px-5 -mt-8">
+        <div class="rounded-[28px] bg-white p-5 shadow-lg">
+          <div class="flex items-end justify-between"><div><div class="text-xs text-slate-400">综合匹配度</div><div class="mt-1 text-3xl font-semibold">89%</div></div><div class="text-right"><div class="text-xs text-slate-400">强项</div><div class="mt-1 text-sm font-semibold">战略 · 分析 · 领导</div></div></div>
+          <div class="mt-5 grid grid-cols-3 gap-2 text-center"><div class="rounded-2xl bg-orange-50 p-3"><div class="text-lg font-semibold text-[#ff8a00]">92</div><div class="text-[10px] text-slate-500 mt-1">逻辑分析</div></div><div class="rounded-2xl bg-blue-50 p-3"><div class="text-lg font-semibold text-blue-600">88</div><div class="text-[10px] text-slate-500 mt-1">组织协调</div></div><div class="rounded-2xl bg-violet-50 p-3"><div class="text-lg font-semibold text-violet-600">85</div><div class="text-[10px] text-slate-500 mt-1">创新驱动</div></div></div>
+        </div>
+        <div class="mt-4 rounded-[28px] bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between"><div class="font-semibold">推荐职业方向</div><button data-go="trends" class="text-xs text-[#ff8a00]">AI趋势</button></div>
+          <div class="mt-4 space-y-3">
+            <button data-go="career" class="w-full flex items-center gap-3 text-left"><div class="w-10 h-10 rounded-xl bg-blue-50 grid place-items-center"><i data-lucide="cpu" class="w-5 h-5 text-blue-500"></i></div><div class="flex-1"><div class="text-sm font-medium">人工智能 / 算法方向</div><div class="text-xs text-slate-400 mt-1">未来趋势强 · 高薪</div></div><span class="text-xs text-emerald-600">92%</span></button>
+            <button data-go="career" class="w-full flex items-center gap-3 text-left"><div class="w-10 h-10 rounded-xl bg-emerald-50 grid place-items-center"><i data-lucide="briefcase-business" class="w-5 h-5 text-emerald-500"></i></div><div class="flex-1"><div class="text-sm font-medium">产品 / 商业分析方向</div><div class="text-xs text-slate-400 mt-1">成长性高 · 匹配</div></div><span class="text-xs text-emerald-600">88%</span></button>
+          </div>
+        </div>
+        <button data-go="majors" class="mt-4 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold">查看对应专业</button>
+      </div>
+    </section>
+
+    <!-- TRENDS -->
+    <section data-screen="trends" class="screen hidden min-h-screen px-5 pt-11 pb-24">
+      <div class="flex items-center justify-between"><div><div class="text-xs font-semibold text-[#ff8a00]">AI 趋势引擎</div><h2 class="mt-1 text-2xl font-semibold">看见未来 5 年</h2></div><button data-back class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+      <div class="mt-5 rounded-[28px] bg-slate-900 p-5 text-white"><div class="text-xs text-white/50">基于你的职业倾向</div><div class="mt-2 text-lg font-semibold">未来高潜职业 Top 3</div><div class="mt-5 grid grid-cols-3 gap-2"><div class="rounded-2xl bg-white/10 p-3"><div class="text-xs text-white/50">01</div><div class="mt-2 text-sm font-semibold">AI工程师</div><div class="mt-2 text-[11px] text-emerald-300">▲ 92%</div></div><div class="rounded-2xl bg-white/10 p-3"><div class="text-xs text-white/50">02</div><div class="mt-2 text-sm font-semibold">产品经理</div><div class="mt-2 text-[11px] text-emerald-300">▲ 87%</div></div><div class="rounded-2xl bg-white/10 p-3"><div class="text-xs text-white/50">03</div><div class="mt-2 text-sm font-semibold">数据分析</div><div class="mt-2 text-[11px] text-emerald-300">▲ 84%</div></div></div></div>
+      <div class="mt-5 flex gap-2 overflow-x-auto no-scrollbar"><button class="trend-filter rounded-full bg-[#ff8a00] px-4 py-2 text-xs text-white" data-filter="all">高潜</button><button class="trend-filter rounded-full bg-white px-4 py-2 text-xs" data-filter="salary">高薪</button><button class="trend-filter rounded-full bg-white px-4 py-2 text-xs" data-filter="stable">稳定</button></div>
+      <div class="mt-4 space-y-3" id="trendList">
+        <button data-go="career" data-tags="salary" class="trend-card w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex gap-4"><img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=500&q=80" class="w-20 h-20 object-cover rounded-2xl" alt=""><div class="flex-1"><div class="flex justify-between"><div class="font-semibold">人工智能工程师</div><span class="text-xs text-emerald-600">强趋势</span></div><div class="mt-1 text-xs text-slate-400">互联网 · 科技 · 制造</div><div class="mt-3 text-xs">薪资潜力 <b>高</b> · 竞争 <b>中高</b></div></div></div></button>
+        <button data-go="career" data-tags="salary stable" class="trend-card w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex gap-4"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=500&q=80" class="w-20 h-20 object-cover rounded-2xl" alt=""><div class="flex-1"><div class="flex justify-between"><div class="font-semibold">数据分析师</div><span class="text-xs text-blue-600">稳定</span></div><div class="mt-1 text-xs text-slate-400">金融 · 零售 · 互联网</div><div class="mt-3 text-xs">薪资潜力 <b>中高</b> · 竞争 <b>中</b></div></div></div></button>
+        <button data-go="career" data-tags="stable" class="trend-card w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex gap-4"><img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=500&q=80" class="w-20 h-20 object-cover rounded-2xl" alt=""><div class="flex-1"><div class="flex justify-between"><div class="font-semibold">产品经理</div><span class="text-xs text-emerald-600">成长</span></div><div class="mt-1 text-xs text-slate-400">互联网 · SaaS · AI</div><div class="mt-3 text-xs">薪资潜力 <b>高</b> · 竞争 <b>高</b></div></div></div></button>
+      </div>
+    </section>
+
+    <!-- CAREER DETAIL -->
+    <section data-screen="career" class="screen hidden min-h-screen bg-white pb-8">
+      <div class="relative h-64"><img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1000&q=85" class="w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div><button data-back class="absolute top-11 left-5 w-10 h-10 rounded-full bg-black/30 text-white grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><div class="absolute bottom-5 left-5 text-white"><div class="text-2xl font-semibold">人工智能工程师</div><div class="mt-1 text-xs text-white/70">科技 · 算法 · 工程</div></div></div>
+      <div class="px-5 pt-5">
+        <div class="grid grid-cols-3 gap-2 text-center"><div class="rounded-2xl bg-slate-50 p-3"><div class="text-lg font-semibold">25k</div><div class="text-[10px] text-slate-400 mt-1">参考月薪</div></div><div class="rounded-2xl bg-slate-50 p-3"><div class="text-lg font-semibold">92%</div><div class="text-[10px] text-slate-400 mt-1">趋势指数</div></div><div class="rounded-2xl bg-slate-50 p-3"><div class="text-lg font-semibold">A+</div><div class="text-[10px] text-slate-400 mt-1">职业前景</div></div></div>
+        <div class="mt-6"><div class="font-semibold">为什么适合你</div><p class="mt-2 text-sm leading-6 text-slate-500">与你在逻辑分析、目标导向和复杂问题拆解方面的优势高度匹配。</p></div>
+        <div class="mt-5"><div class="font-semibold">能力地图</div><div class="mt-3 space-y-3 text-xs"><div><div class="flex justify-between mb-1"><span>数学 / 算法</span><span>90%</span></div><div class="h-2 rounded-full bg-slate-100"><div class="h-full w-[90%] rounded-full bg-[#ff8a00]"></div></div></div><div><div class="flex justify-between mb-1"><span>编程能力</span><span>88%</span></div><div class="h-2 rounded-full bg-slate-100"><div class="h-full w-[88%] rounded-full bg-slate-900"></div></div></div><div><div class="flex justify-between mb-1"><span>沟通协作</span><span>72%</span></div><div class="h-2 rounded-full bg-slate-100"><div class="h-full w-[72%] rounded-full bg-blue-500"></div></div></div></div></div>
+        <button data-go="majors" class="mt-6 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold">查看对应专业</button>
+      </div>
+    </section>
+
+    <!-- MAJORS -->
+    <section data-screen="majors" class="screen hidden min-h-screen px-5 pt-11 pb-24">
+      <div class="flex items-center justify-between"><h2 class="text-2xl font-semibold">查专业</h2><button data-back class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+      <div class="mt-5 rounded-[24px] bg-gradient-to-r from-orange-100 to-amber-50 p-4"><div class="text-xs text-[#ff8a00] font-semibold">结合你的职业测评</div><div class="mt-1 text-lg font-semibold">优先推荐 12 个高匹配专业</div><div class="mt-1 text-xs text-slate-500">融合兴趣、就业趋势与成绩区间</div></div>
+      <div class="mt-5 space-y-3">
+        <button data-go="majorDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex justify-between"><div><div class="font-semibold">计算机科学与技术</div><div class="mt-1 text-xs text-slate-400">工学 · 计算机类</div></div><span class="text-xs text-emerald-600">匹配 91%</span></div><div class="mt-4 flex gap-2"><span class="rounded-full bg-orange-50 px-2.5 py-1 text-[10px] text-[#ff8a00]">就业面广</span><span class="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] text-blue-600">薪资较高</span></div></button>
+        <button data-go="majorDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex justify-between"><div><div class="font-semibold">人工智能</div><div class="mt-1 text-xs text-slate-400">工学 · 电子信息类</div></div><span class="text-xs text-emerald-600">匹配 89%</span></div><div class="mt-4 flex gap-2"><span class="rounded-full bg-orange-50 px-2.5 py-1 text-[10px] text-[#ff8a00]">高成长</span><span class="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] text-blue-600">趋势强</span></div></button>
+        <button data-go="majorDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex justify-between"><div><div class="font-semibold">数据科学与大数据技术</div><div class="mt-1 text-xs text-slate-400">工学 · 计算机类</div></div><span class="text-xs text-emerald-600">匹配 86%</span></div><div class="mt-4 flex gap-2"><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px]">复合型</span><span class="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] text-blue-600">就业多元</span></div></button>
+      </div>
+    </section>
+
+    <!-- MAJOR DETAIL -->
+    <section data-screen="majorDetail" class="screen hidden min-h-screen bg-white px-5 pt-11 pb-8">
+      <div class="flex justify-between"><button data-back class="w-10 h-10 grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><button class="w-10 h-10 grid place-items-center" data-like><i data-lucide="bookmark" class="w-5 h-5"></i></button></div>
+      <div class="mt-4 text-xs text-[#ff8a00] font-semibold">本科 · 工学</div><h2 class="mt-1 text-2xl font-semibold">计算机科学与技术</h2><div class="mt-2 text-xs text-slate-400">专业代码 080901 · 修业年限 4 年</div>
+      <div class="mt-5 grid grid-cols-3 gap-2 text-center"><div class="rounded-2xl bg-orange-50 p-3"><div class="font-semibold text-[#ff8a00]">91%</div><div class="text-[10px] text-slate-500 mt-1">与你匹配</div></div><div class="rounded-2xl bg-blue-50 p-3"><div class="font-semibold text-blue-600">A</div><div class="text-[10px] text-slate-500 mt-1">就业前景</div></div><div class="rounded-2xl bg-emerald-50 p-3"><div class="font-semibold text-emerald-600">985+</div><div class="text-[10px] text-slate-500 mt-1">开设院校</div></div></div>
+      <div class="mt-6"><div class="font-semibold">专业学什么</div><p class="mt-2 text-sm leading-6 text-slate-500">围绕程序设计、数据结构、计算机系统、算法与人工智能基础，培养计算与工程实践能力。</p></div>
+      <div class="mt-5"><div class="font-semibold">典型职业去向</div><div class="mt-3 flex flex-wrap gap-2"><span class="rounded-full bg-slate-100 px-3 py-2 text-xs">软件工程师</span><span class="rounded-full bg-slate-100 px-3 py-2 text-xs">算法工程师</span><span class="rounded-full bg-slate-100 px-3 py-2 text-xs">数据分析师</span><span class="rounded-full bg-slate-100 px-3 py-2 text-xs">产品经理</span></div></div>
+      <div class="mt-6 flex items-center justify-between"><div class="font-semibold">推荐院校</div><button data-go="universities" class="text-xs text-[#ff8a00]">查看全部</button></div>
+      <button data-go="universityDetail" class="mt-3 w-full rounded-2xl border border-slate-100 p-4 text-left flex justify-between"><div><div class="text-sm font-medium">山东大学</div><div class="mt-1 text-xs text-slate-400">985 / 211 / 双一流</div></div><span class="text-xs text-emerald-600">稳</span></button>
+    </section>
+
+    <!-- UNIVERSITIES -->
+    <section data-screen="universities" class="screen hidden min-h-screen px-5 pt-11 pb-24">
+      <div class="flex items-center justify-between"><h2 class="text-2xl font-semibold">查大学</h2><button data-back class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+      <div class="mt-5 grid grid-cols-4 gap-2 text-center text-xs"><button class="rounded-2xl bg-white py-3 shadow-sm">省份</button><button class="rounded-2xl bg-white py-3 shadow-sm">层次</button><button class="rounded-2xl bg-white py-3 shadow-sm">类型</button><button class="rounded-2xl bg-white py-3 shadow-sm">更多</button></div>
+      <div class="mt-4 rounded-2xl bg-orange-50 p-3 text-xs text-[#ff8a00]">按你当前成绩，以下院校更值得重点关注</div>
+      <div class="mt-4 space-y-3">
+        <button data-go="universityDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex gap-3"><div class="w-12 h-12 rounded-2xl bg-red-50 grid place-items-center font-bold text-red-600">山大</div><div class="flex-1"><div class="flex justify-between"><div class="font-semibold">山东大学</div><span class="text-xs text-emerald-600">稳 76%</span></div><div class="mt-1 text-xs text-slate-400">山东 · 综合 · 985 · 211</div><div class="mt-3 text-xs text-slate-500">近三年最低位次：约 16,000</div></div></div></button>
+        <button data-go="universityDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex gap-3"><div class="w-12 h-12 rounded-2xl bg-blue-50 grid place-items-center font-bold text-blue-600">海大</div><div class="flex-1"><div class="flex justify-between"><div class="font-semibold">中国海洋大学</div><span class="text-xs text-orange-500">冲 42%</span></div><div class="mt-1 text-xs text-slate-400">山东 · 综合 · 985 · 211</div><div class="mt-3 text-xs text-slate-500">近三年最低位次：约 12,500</div></div></div></button>
+        <button data-go="universityDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex gap-3"><div class="w-12 h-12 rounded-2xl bg-emerald-50 grid place-items-center font-bold text-emerald-600">青大</div><div class="flex-1"><div class="flex justify-between"><div class="font-semibold">青岛大学</div><span class="text-xs text-blue-600">保 88%</span></div><div class="mt-1 text-xs text-slate-400">山东 · 综合</div><div class="mt-3 text-xs text-slate-500">近三年最低位次：约 29,000</div></div></div></button>
+      </div>
+    </section>
+
+    <!-- UNIVERSITY DETAIL -->
+    <section data-screen="universityDetail" class="screen hidden min-h-screen bg-white pb-8">
+      <div class="relative h-64"><img src="https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=1000&q=85" class="w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent"></div><button data-back class="absolute top-11 left-5 w-10 h-10 rounded-full bg-black/30 text-white grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><div class="absolute bottom-5 left-5 text-white"><div class="text-2xl font-semibold">山东大学</div><div class="mt-1 text-xs text-white/70">985 · 211 · 双一流 · 综合类</div></div></div>
+      <div class="px-5 pt-5">
+        <div class="grid grid-cols-3 gap-2 text-center"><div class="rounded-2xl bg-orange-50 p-3"><div class="font-semibold text-[#ff8a00]">76%</div><div class="text-[10px] text-slate-500 mt-1">录取概率</div></div><div class="rounded-2xl bg-blue-50 p-3"><div class="font-semibold text-blue-600">16k</div><div class="text-[10px] text-slate-500 mt-1">参考位次</div></div><div class="rounded-2xl bg-emerald-50 p-3"><div class="font-semibold text-emerald-600">稳</div><div class="text-[10px] text-slate-500 mt-1">当前策略</div></div></div>
+        <div class="mt-6 font-semibold">适合你的专业</div>
+        <div class="mt-3 space-y-2"><button data-go="majorDetail" class="w-full rounded-2xl border border-slate-100 p-3 flex justify-between text-left"><div><div class="text-sm font-medium">计算机科学与技术</div><div class="mt-1 text-xs text-slate-400">专业匹配 91%</div></div><span class="text-xs text-emerald-600">A</span></button><button data-go="majorDetail" class="w-full rounded-2xl border border-slate-100 p-3 flex justify-between text-left"><div><div class="text-sm font-medium">人工智能</div><div class="mt-1 text-xs text-slate-400">专业匹配 89%</div></div><span class="text-xs text-emerald-600">A</span></button></div>
+        <button data-go="volunteer" class="mt-6 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold">加入志愿方案</button>
+      </div>
+    </section>
+
+    <!-- VOLUNTEER -->
+    <section data-screen="volunteer" class="screen hidden min-h-screen px-5 pt-11 pb-24">
+      <div class="flex justify-between items-center"><div><div class="text-xs font-semibold text-[#ff8a00]">AI 智能填报</div><h2 class="mt-1 text-2xl font-semibold">生成冲稳保方案</h2></div><button data-back class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+      <div class="mt-5 rounded-[28px] bg-white p-5 shadow-sm"><div class="grid grid-cols-2 gap-4"><div><div class="text-xs text-slate-400">省份</div><div id="vProvince" class="mt-1 font-semibold">山东</div></div><div><div class="text-xs text-slate-400">选科</div><div id="vSubjects" class="mt-1 font-semibold">物化生</div></div><div><div class="text-xs text-slate-400">高考分数</div><div id="vScore" class="mt-1 font-semibold">582 分</div></div><div><div class="text-xs text-slate-400">省排名</div><div class="mt-1 font-semibold">19,860</div></div></div></div>
+      <div class="mt-5 rounded-[28px] bg-white p-5 shadow-sm">
+        <div class="font-semibold">专业方向</div>
+        <div class="mt-3 flex gap-2 flex-wrap" id="majorPrefs"><button class="pref active rounded-full bg-orange-50 text-[#ff8a00] px-3 py-2 text-xs">计算机</button><button class="pref active rounded-full bg-orange-50 text-[#ff8a00] px-3 py-2 text-xs">人工智能</button><button class="pref rounded-full bg-slate-100 px-3 py-2 text-xs">金融</button><button class="pref rounded-full bg-slate-100 px-3 py-2 text-xs">医学</button></div>
+        <div class="mt-5 font-semibold">地区偏好</div>
+        <div class="mt-3 flex gap-2 flex-wrap"><span class="rounded-full bg-orange-50 text-[#ff8a00] px-3 py-2 text-xs">山东</span><span class="rounded-full bg-orange-50 text-[#ff8a00] px-3 py-2 text-xs">上海</span><span class="rounded-full bg-orange-50 text-[#ff8a00] px-3 py-2 text-xs">江苏</span></div>
+      </div>
+      <button id="generatePlan" class="mt-6 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-5 h-5"></i>AI 生成方案</button>
+      <div class="mt-3 text-center text-xs text-slate-400">按“冲 / 稳 / 保”策略进行多维度匹配</div>
+    </section>
+
+    <!-- PLAN -->
+    <section data-screen="plan" class="screen hidden min-h-screen px-5 pt-11 pb-24">
+      <div class="flex items-center justify-between"><div><div class="text-xs text-slate-400">AI 已生成</div><h2 class="mt-1 text-2xl font-semibold">推荐志愿方案</h2></div><button data-back class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button></div>
+      <div class="mt-5 grid grid-cols-3 gap-2 text-center"><button class="plan-filter rounded-2xl bg-orange-50 p-3" data-plan="rush"><div class="text-xl font-semibold text-orange-500">18</div><div class="text-[10px] text-slate-500 mt-1">冲</div></button><button class="plan-filter rounded-2xl bg-emerald-50 p-3" data-plan="steady"><div class="text-xl font-semibold text-emerald-600">42</div><div class="text-[10px] text-slate-500 mt-1">稳</div></button><button class="plan-filter rounded-2xl bg-blue-50 p-3" data-plan="safe"><div class="text-xl font-semibold text-blue-600">36</div><div class="text-[10px] text-slate-500 mt-1">保</div></button></div>
+      <div class="mt-4 space-y-3" id="planCards">
+        <button data-plan-card="steady" data-go="planDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex justify-between"><div><div class="font-semibold">山东大学</div><div class="mt-1 text-xs text-slate-400">计算机科学与技术</div></div><span class="rounded-full bg-emerald-50 text-emerald-600 px-2 py-1 text-xs self-start">稳</span></div><div class="mt-4 flex justify-between text-xs"><span>录取概率 <b>76%</b></span><span>专业匹配 <b>91%</b></span><span>趋势 <b>强</b></span></div></button>
+        <button data-plan-card="rush" data-go="planDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex justify-between"><div><div class="font-semibold">中国海洋大学</div><div class="mt-1 text-xs text-slate-400">人工智能</div></div><span class="rounded-full bg-orange-50 text-orange-500 px-2 py-1 text-xs self-start">冲</span></div><div class="mt-4 flex justify-between text-xs"><span>录取概率 <b>43%</b></span><span>专业匹配 <b>89%</b></span><span>趋势 <b>强</b></span></div></button>
+        <button data-plan-card="safe" data-go="planDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex justify-between"><div><div class="font-semibold">青岛大学</div><div class="mt-1 text-xs text-slate-400">数据科学与大数据技术</div></div><span class="rounded-full bg-blue-50 text-blue-600 px-2 py-1 text-xs self-start">保</span></div><div class="mt-4 flex justify-between text-xs"><span>录取概率 <b>89%</b></span><span>专业匹配 <b>86%</b></span><span>趋势 <b>稳</b></span></div></button>
+      </div>
+      <button data-go="volunteerTable" class="mt-5 w-full rounded-2xl bg-slate-900 py-4 text-white font-semibold">查看完整志愿表</button>
+    </section>
+
+    <!-- PLAN DETAIL -->
+    <section data-screen="planDetail" class="screen hidden min-h-screen bg-white px-5 pt-11 pb-8">
+      <div class="flex justify-between"><button data-back class="w-10 h-10 grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><span class="rounded-full bg-emerald-50 text-emerald-600 px-3 py-2 text-xs">稳妥方案</span></div>
+      <div class="mt-5 text-2xl font-semibold">山东大学</div><div class="mt-1 text-sm text-slate-500">计算机科学与技术</div>
+      <div class="mt-6 rounded-[28px] bg-slate-900 p-5 text-white"><div class="text-xs text-white/50">综合录取概率</div><div class="mt-1 text-4xl font-semibold">76%</div><div class="mt-5 grid grid-cols-3 gap-2 text-center"><div><div class="text-sm font-semibold">582</div><div class="text-[10px] text-white/50 mt-1">你的分数</div></div><div><div class="text-sm font-semibold">578</div><div class="text-[10px] text-white/50 mt-1">近年参考</div></div><div><div class="text-sm font-semibold">+4</div><div class="text-[10px] text-white/50 mt-1">分差</div></div></div></div>
+      <div class="mt-5 rounded-[28px] bg-slate-50 p-5"><div class="font-semibold">AI 判断依据</div><div class="mt-4 space-y-4 text-sm"><div class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 shrink-0"></i><div><div class="font-medium">位次相对稳定</div><div class="mt-1 text-xs text-slate-400">近三年同位次波动在安全区间内</div></div></div><div class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 shrink-0"></i><div><div class="font-medium">职业方向高度匹配</div><div class="mt-1 text-xs text-slate-400">与职业测评和未来趋势一致</div></div></div><div class="flex gap-3"><i data-lucide="alert-circle" class="w-5 h-5 text-orange-500 shrink-0"></i><div><div class="font-medium">热门专业竞争偏高</div><div class="mt-1 text-xs text-slate-400">建议配置 2-3 个同类备选专业</div></div></div></div></div>
+      <button data-back class="mt-6 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold">保留在志愿表</button>
+    </section>
+
+    <!-- VOLUNTEER TABLE -->
+    <section data-screen="volunteerTable" class="screen hidden min-h-screen px-5 pt-11 pb-8">
+      <div class="flex justify-between items-center"><div><div class="text-xs text-slate-400">方案 A</div><h2 class="mt-1 text-2xl font-semibold">我的志愿表</h2></div><button data-back class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button></div>
+      <div class="mt-5 rounded-2xl bg-orange-50 p-3 text-xs text-[#ff8a00]">当前 4 / 96 个志愿 · AI 建议继续补足“保”档</div>
+      <div id="volunteerList" class="mt-4 space-y-2">
+        <div draggable="true" class="vol-item rounded-2xl bg-white p-4 shadow-sm flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-slate-100 grid place-items-center text-xs">01</span><div class="flex-1"><div class="text-sm font-semibold">中国海洋大学</div><div class="text-xs text-slate-400 mt-1">人工智能</div></div><span class="text-xs text-orange-500">冲</span><i data-lucide="grip-vertical" class="w-4 h-4 text-slate-300"></i></div>
+        <div draggable="true" class="vol-item rounded-2xl bg-white p-4 shadow-sm flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-slate-100 grid place-items-center text-xs">02</span><div class="flex-1"><div class="text-sm font-semibold">山东大学</div><div class="text-xs text-slate-400 mt-1">计算机科学与技术</div></div><span class="text-xs text-emerald-600">稳</span><i data-lucide="grip-vertical" class="w-4 h-4 text-slate-300"></i></div>
+        <div draggable="true" class="vol-item rounded-2xl bg-white p-4 shadow-sm flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-slate-100 grid place-items-center text-xs">03</span><div class="flex-1"><div class="text-sm font-semibold">青岛大学</div><div class="text-xs text-slate-400 mt-1">数据科学与大数据技术</div></div><span class="text-xs text-blue-600">保</span><i data-lucide="grip-vertical" class="w-4 h-4 text-slate-300"></i></div>
+      </div>
+      <button id="addVolunteer" class="mt-4 w-full rounded-2xl border border-dashed border-slate-300 py-4 text-sm text-slate-500">+ 添加志愿</button>
+      <button id="exportBtn" class="mt-4 w-full rounded-2xl bg-slate-900 py-4 text-white font-semibold">导出志愿表</button>
+    </section>
+
+    <!-- AI -->
+    <section data-screen="ai" class="screen hidden min-h-screen pb-24">
+      <div class="px-5 pt-11">
+        <div class="flex items-center justify-between"><div><div class="text-xs font-semibold text-[#ff8a00]">择学 AI</div><h2 class="mt-1 text-2xl font-semibold">有问题，直接问</h2></div><div class="w-11 h-11 rounded-2xl bg-[#ff8a00] text-white grid place-items-center font-bold">AI</div></div>
+        <div id="chat" class="mt-6 space-y-4">
+          <div class="flex gap-3"><div class="w-9 h-9 rounded-xl bg-[#ff8a00] text-white text-xs grid place-items-center font-bold">AI</div><div class="max-w-[270px] rounded-[22px] rounded-tl-md bg-white p-4 text-sm leading-6 shadow-sm">你好，我已经读取你的高考档案和职业测评结果。你可以问我院校、专业、职业趋势或志愿策略。</div></div>
+        </div>
+        <div class="mt-5 flex flex-wrap gap-2"><button class="quick-q rounded-full bg-white px-3 py-2 text-xs">帮我解释“冲稳保”</button><button class="quick-q rounded-full bg-white px-3 py-2 text-xs">这个专业未来好就业吗？</button><button class="quick-q rounded-full bg-white px-3 py-2 text-xs">帮我看志愿表</button></div>
+      </div>
+      <div class="fixed bottom-[76px] left-0 right-0 w-full px-5">
+        <div class="flex gap-3 bg-[#f7f8fa] pt-3"><input id="chatInput" class="flex-1 min-w-0 rounded-2xl bg-white px-4 py-4 text-sm outline-none shadow-lg" placeholder="输入你的问题..."><button id="sendChat" class="w-12 h-12 rounded-2xl bg-[#ff8a00] text-white grid place-items-center shadow-lg"><i data-lucide="arrow-up" class="w-5 h-5"></i></button></div>
+      </div>
+    </section>
+
+    <!-- PLANNER -->
+    <section data-screen="planner" class="screen hidden min-h-screen px-5 pt-11 pb-24">
+      <div class="flex justify-between items-center"><div><div class="text-xs font-semibold text-[#ff8a00]">1 对 1 专业服务</div><h2 class="mt-1 text-2xl font-semibold">志愿规划师</h2></div><button data-back class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+      <div class="mt-5 rounded-[24px] bg-slate-900 p-4 text-white"><div class="text-sm font-semibold">AI 先诊断，规划师再深度沟通</div><div class="mt-1 text-xs text-white/55">把咨询时间留给关键决策。</div></div>
+      <div class="mt-5 space-y-3">
+        <button data-go="plannerDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex gap-3"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80" class="w-16 h-16 object-cover rounded-2xl" alt=""><div class="flex-1"><div class="flex justify-between"><div class="font-semibold">王老师</div><span class="text-xs text-[#ff8a00]">4.9 ★</span></div><div class="mt-1 text-xs text-slate-400">8 年升学规划经验 · 山东</div><div class="mt-3 flex gap-2"><span class="rounded-full bg-orange-50 px-2 py-1 text-[10px] text-[#ff8a00]">新高考</span><span class="rounded-full bg-blue-50 px-2 py-1 text-[10px] text-blue-600">理工科</span></div></div></div><div class="mt-4 flex justify-between items-center"><div class="text-xs text-slate-400">已服务 1,260 人</div><div class="font-semibold">¥100<span class="text-xs font-normal text-slate-400">/小时起</span></div></div></button>
+        <button data-go="plannerDetail" class="w-full rounded-[24px] bg-white p-4 text-left shadow-sm"><div class="flex gap-3"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" class="w-16 h-16 object-cover rounded-2xl" alt=""><div class="flex-1"><div class="flex justify-between"><div class="font-semibold">李老师</div><span class="text-xs text-[#ff8a00]">4.8 ★</span></div><div class="mt-1 text-xs text-slate-400">6 年职业规划经验 · 华东</div></div></div><div class="mt-4 flex justify-between items-center"><div class="text-xs text-slate-400">已服务 980 人</div><div class="font-semibold">¥120<span class="text-xs font-normal text-slate-400">/小时起</span></div></div></button>
+      </div>
+    </section>
+
+    <!-- PLANNER DETAIL -->
+    <section data-screen="plannerDetail" class="screen hidden min-h-screen bg-white px-5 pt-11 pb-8">
+      <div class="flex justify-between"><button data-back class="w-10 h-10 grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><button class="w-10 h-10 grid place-items-center"><i data-lucide="share-2" class="w-5 h-5"></i></button></div>
+      <div class="mt-3 flex gap-4 items-center"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=500&q=80" class="w-20 h-20 rounded-3xl object-cover" alt=""><div><div class="text-xl font-semibold">王老师</div><div class="mt-1 text-xs text-slate-400">8 年升学规划经验 · 山东</div><div class="mt-2 text-xs text-[#ff8a00]">4.9 ★ · 1,260 次服务</div></div></div>
+      <div class="mt-6 rounded-[26px] bg-slate-50 p-5"><div class="font-semibold">擅长领域</div><div class="mt-3 flex flex-wrap gap-2"><span class="rounded-full bg-white px-3 py-2 text-xs">新高考</span><span class="rounded-full bg-white px-3 py-2 text-xs">理工科</span><span class="rounded-full bg-white px-3 py-2 text-xs">专业规划</span></div></div>
+      <div class="mt-5 font-semibold">服务内容</div><div class="mt-3 space-y-3 text-sm"><div class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-emerald-500"></i><span>1 对 1 深度了解考生情况</span></div><div class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-emerald-500"></i><span>院校、专业、职业路径综合建议</span></div><div class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-emerald-500"></i><span>志愿表复核与风险提醒</span></div></div>
+      <div class="mt-6 rounded-[24px] bg-orange-50 p-4"><div class="text-xs text-slate-500">价格</div><div class="mt-1 text-2xl font-semibold text-[#ff8a00]">¥100 <span class="text-xs font-normal text-slate-400">/ 小时起</span></div></div>
+      <button data-go="booking" class="mt-5 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold">预约咨询</button>
+    </section>
+
+    <!-- BOOKING -->
+    <section data-screen="booking" class="screen hidden min-h-screen px-5 pt-11 pb-8">
+      <div class="flex items-center gap-3"><button data-back class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><h2 class="text-xl font-semibold">预约王老师</h2></div>
+      <div class="mt-6 rounded-[28px] bg-white p-5 shadow-sm">
+        <div class="font-semibold">选择日期</div>
+        <div class="mt-4 grid grid-cols-4 gap-2 text-center text-xs" id="datePicker"><button class="date-btn rounded-2xl bg-slate-50 py-3"><div>周一</div><div class="mt-1 font-semibold">12</div></button><button class="date-btn active rounded-2xl bg-[#ff8a00] text-white py-3"><div>周二</div><div class="mt-1 font-semibold">13</div></button><button class="date-btn rounded-2xl bg-slate-50 py-3"><div>周三</div><div class="mt-1 font-semibold">14</div></button><button class="date-btn rounded-2xl bg-slate-50 py-3"><div>周四</div><div class="mt-1 font-semibold">15</div></button></div>
+        <div class="mt-6 font-semibold">选择时间</div><div class="mt-3 grid grid-cols-3 gap-2 text-xs" id="timePicker"><button class="time-btn rounded-xl border border-slate-200 py-3">14:00</button><button class="time-btn active rounded-xl border-2 border-[#ff8a00] bg-orange-50 text-[#ff8a00] py-3">15:30</button><button class="time-btn rounded-xl border border-slate-200 py-3">17:00</button></div>
+      </div>
+      <div class="mt-5 rounded-[28px] bg-white p-5 shadow-sm"><div class="font-semibold">咨询主题</div><div class="mt-3 flex flex-wrap gap-2"><span class="rounded-full bg-orange-50 px-3 py-2 text-xs text-[#ff8a00]">志愿方案复核</span><span class="rounded-full bg-slate-100 px-3 py-2 text-xs">专业选择</span><span class="rounded-full bg-slate-100 px-3 py-2 text-xs">职业规划</span></div><textarea class="mt-4 w-full rounded-2xl bg-slate-50 p-4 text-sm outline-none" rows="4" placeholder="填写最想解决的问题"></textarea></div>
+      <button id="confirmBooking" class="mt-5 w-full rounded-2xl bg-[#ff8a00] py-4 text-white font-semibold">确认预约 · ¥100</button>
+    </section>
+
+    <!-- NEWS -->
+    <section data-screen="news" class="screen hidden min-h-screen px-5 pt-11 pb-24">
+      <div class="flex justify-between items-center"><h2 class="text-2xl font-semibold">高考资讯</h2><button class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="search" class="w-5 h-5"></i></button></div>
+      <div class="mt-4 flex gap-2"><span class="rounded-full bg-[#ff8a00] text-white px-4 py-2 text-xs">推荐</span><span class="rounded-full bg-white px-4 py-2 text-xs">政策</span><span class="rounded-full bg-white px-4 py-2 text-xs">院校</span><span class="rounded-full bg-white px-4 py-2 text-xs">专业</span></div>
+      <article class="mt-4 rounded-[26px] bg-white overflow-hidden shadow-sm"><img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=900&q=80" class="h-44 w-full object-cover" alt=""><div class="p-4"><div class="text-xs text-[#ff8a00]">政策解读</div><div class="mt-1 text-lg font-semibold leading-snug">新高考志愿填报，考生最容易忽略的 5 个变化</div><div class="mt-2 text-xs text-slate-400">3 小时前 · 6.2k 阅读</div></div></article>
+      <div class="mt-4 space-y-3"><article class="rounded-2xl bg-white p-4 flex gap-3"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=80" class="w-20 h-20 rounded-xl object-cover" alt=""><div class="flex-1"><div class="text-sm font-semibold leading-5">大学专业到底该看热度，还是看未来就业？</div><div class="mt-2 text-xs text-slate-400">职业规划 · 4.1k 阅读</div></div></article><article class="rounded-2xl bg-white p-4 flex gap-3"><img src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=500&q=80" class="w-20 h-20 rounded-xl object-cover" alt=""><div class="flex-1"><div class="text-sm font-semibold leading-5">选大学时，“城市”到底应该占多大权重？</div><div class="mt-2 text-xs text-slate-400">院校选择 · 3.6k 阅读</div></div></article></div>
+    </section>
+
+    <!-- VIP -->
+    <section data-screen="vip" class="screen hidden min-h-screen bg-[#121212] text-white px-5 pt-11 pb-8">
+      <div class="flex justify-between items-center"><div><div class="text-xs text-amber-300">择学通 VIP</div><h2 class="mt-1 text-2xl font-semibold">把关键决策做得更稳</h2></div><button data-back class="w-10 h-10 rounded-full bg-white/10 grid place-items-center"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+      <div class="mt-6 rounded-[28px] bg-gradient-to-br from-amber-200 via-orange-300 to-orange-500 p-5 text-slate-900"><div class="text-sm font-semibold">年度会员</div><div class="mt-2 text-4xl font-bold">¥88</div><div class="mt-1 text-xs text-slate-700">有效期按高考年度计算</div><button id="buyVip" class="mt-5 rounded-xl bg-slate-900 px-5 py-3 text-sm text-white font-semibold">立即开通</button></div>
+      <div class="mt-6 font-semibold">会员权益</div>
+      <div class="mt-4 grid grid-cols-2 gap-3"><div class="rounded-2xl bg-white/5 p-4"><i data-lucide="sparkles" class="w-5 h-5 text-amber-300"></i><div class="mt-3 text-sm font-medium">完整 AI 趋势分析</div><div class="mt-1 text-xs text-white/45">职业 / 行业发展趋势</div></div><div class="rounded-2xl bg-white/5 p-4"><i data-lucide="list-checks" class="w-5 h-5 text-amber-300"></i><div class="mt-3 text-sm font-medium">AI 智能填报</div><div class="mt-1 text-xs text-white/45">冲稳保方案与志愿表</div></div><div class="rounded-2xl bg-white/5 p-4"><i data-lucide="bot" class="w-5 h-5 text-amber-300"></i><div class="mt-3 text-sm font-medium">AI 助手</div><div class="mt-1 text-xs text-white/45">连续问答与方案解释</div></div><div class="rounded-2xl bg-white/5 p-4"><i data-lucide="user-round-check" class="w-5 h-5 text-amber-300"></i><div class="mt-3 text-sm font-medium">规划师服务</div><div class="mt-1 text-xs text-white/45">预约与专属优惠</div></div></div>
+    </section>
+
+    <!-- ME -->
+    <section data-screen="me" class="screen hidden min-h-screen px-5 pt-11 pb-24">
+      <div class="flex items-center gap-4"><div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-[#ff8a00] to-orange-300 text-white grid place-items-center text-xl font-semibold">张</div><div class="flex-1"><div class="text-xl font-semibold">张同学</div><div id="meProfile" class="mt-1 text-xs text-slate-400">山东 · 物化生 · 582 分</div></div><button class="w-10 h-10 rounded-full bg-white grid place-items-center"><i data-lucide="settings" class="w-5 h-5"></i></button></div>
+      <button data-go="vip" class="mt-5 w-full rounded-[24px] bg-slate-900 p-4 text-left text-white flex items-center justify-between"><div><div class="text-sm font-semibold">择学通 VIP</div><div class="mt-1 text-xs text-white/50">解锁完整 AI 志愿与职业规划</div></div><span class="rounded-full bg-amber-300 text-slate-900 px-3 py-2 text-xs font-semibold">¥88 开通</span></button>
+      <div class="mt-5 grid grid-cols-4 gap-2 text-center"><button class="rounded-2xl bg-white p-3 shadow-sm"><i data-lucide="heart" class="w-5 h-5 mx-auto"></i><div class="mt-2 text-[11px]">收藏</div></button><button class="rounded-2xl bg-white p-3 shadow-sm"><i data-lucide="clock-3" class="w-5 h-5 mx-auto"></i><div class="mt-2 text-[11px]">记录</div></button><button data-go="booking" class="rounded-2xl bg-white p-3 shadow-sm"><i data-lucide="calendar-days" class="w-5 h-5 mx-auto"></i><div class="mt-2 text-[11px]">预约</div></button><button class="rounded-2xl bg-white p-3 shadow-sm"><i data-lucide="message-square" class="w-5 h-5 mx-auto"></i><div class="mt-2 text-[11px]">反馈</div></button></div>
+      <div class="mt-5 rounded-[28px] bg-white overflow-hidden shadow-sm"><button data-go="profile" class="w-full flex items-center justify-between p-4 border-b border-slate-50"><div class="flex items-center gap-3"><i data-lucide="graduation-cap" class="w-5 h-5 text-[#ff8a00]"></i><span class="text-sm">我的高考档案</span></div><i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i></button><button data-go="result" class="w-full flex items-center justify-between p-4 border-b border-slate-50"><div class="flex items-center gap-3"><i data-lucide="brain" class="w-5 h-5 text-violet-500"></i><span class="text-sm">职业测评报告</span></div><i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i></button><button data-go="volunteerTable" class="w-full flex items-center justify-between p-4 border-b border-slate-50"><div class="flex items-center gap-3"><i data-lucide="list-checks" class="w-5 h-5 text-emerald-500"></i><span class="text-sm">我的志愿表</span></div><i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i></button><button class="w-full flex items-center justify-between p-4"><div class="flex items-center gap-3"><i data-lucide="shield-check" class="w-5 h-5 text-blue-500"></i><span class="text-sm">隐私与数据安全</span></div><i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i></button></div>
+    </section>
+
+    <!-- BOTTOM TAB -->
+    <nav id="tabbar" class="hidden fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[76px] bg-white/95 backdrop-blur border-t border-slate-100 px-5 pb-[env(safe-area-inset-bottom)] z-50">
+      <div class="h-full grid grid-cols-5 items-center">
+        <button data-tab="home" class="tab-btn text-[#ff8a00] text-[10px] flex flex-col items-center gap-1"><i data-lucide="house" class="w-5 h-5"></i><span>首页</span></button>
+        <button data-tab="volunteer" class="tab-btn text-slate-400 text-[10px] flex flex-col items-center gap-1"><i data-lucide="list-checks" class="w-5 h-5"></i><span>志愿</span></button>
+        <button data-tab="ai" class="tab-btn text-slate-400 text-[10px] flex flex-col items-center gap-1"><div class="w-12 h-12 rounded-full bg-[#ff8a00] text-white grid place-items-center -mt-6 shadow-lg font-bold">AI</div></button>
+        <button data-tab="news" class="tab-btn text-slate-400 text-[10px] flex flex-col items-center gap-1"><i data-lucide="newspaper" class="w-5 h-5"></i><span>资讯</span></button>
+        <button data-tab="me" class="tab-btn text-slate-400 text-[10px] flex flex-col items-center gap-1"><i data-lucide="user" class="w-5 h-5"></i><span>我的</span></button>
+      </div>
+    </nav>
+
+    <!-- TOAST -->
+    <div id="toast" class="pointer-events-none fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden max-w-[360px] rounded-2xl bg-slate-900 text-white px-4 py-3 text-sm shadow-xl"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const screens=[...document.querySelectorAll('.screen')];
+  const tabbar=document.getElementById('tabbar');
+  const mainTabs=['home','volunteer','ai','news','me'];
+  let historyStack=['onboarding'];
+  let current='onboarding';
+  const safeStore=(value)=>{try{window.localStorage.setItem('gkzt_state',JSON.stringify(value));}catch(error){/* Sandboxed portfolio preview: keep state in memory. */}};
+  const state={
+    role:'student',
+    province:'山东',
+    score:582,
+    subjects:['物理','化学','生物'],
+    cities:['上海','杭州'],
+    vip:false
+  };
+
+  function toast(msg){
+    const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('hidden');
+    clearTimeout(window.__toastTimer); window.__toastTimer=setTimeout(()=>t.classList.add('hidden'),2200);
+  }
+  function renderProfile(){
+    const sub=state.subjects.map(x=>x[0]).join('');
+    document.getElementById('homeScore').textContent=`${state.score} 分 · ${state.province}`;
+    document.getElementById('homeSubjects').textContent=sub || '未选科';
+    document.getElementById('vProvince').textContent=state.province;
+    document.getElementById('vSubjects').textContent=sub || '未选科';
+    document.getElementById('vScore').textContent=`${state.score} 分`;
+    document.getElementById('meProfile').textContent=`${state.province} · ${sub || '未选科'} · ${state.score} 分`;
+  }
+  function showScreen(name,push=true){
+    if(!document.querySelector(`[data-screen="${name}"]`)) return;
+    screens.forEach(s=>s.classList.add('hidden'));
+    document.querySelector(`[data-screen="${name}"]`).classList.remove('hidden');
+    if(push && current!==name) historyStack.push(name);
+    current=name;
+    tabbar.classList.toggle('hidden',!mainTabs.includes(name));
+    document.querySelectorAll('.tab-btn').forEach(b=>{
+      const active=b.dataset.tab===name;
+      b.classList.toggle('text-[#ff8a00]',active);
+      b.classList.toggle('text-slate-400',!active);
+    });
+    const activeScreen=document.querySelector(`[data-screen="${name}"]`); if(activeScreen) activeScreen.scrollTop=0;
+    lucide.createIcons();
+  }
+  function back(){
+    if(historyStack.length>1){ historyStack.pop(); const p=historyStack[historyStack.length-1]; current=p; showScreen(p,false); }
+    else showScreen('home');
+  }
+  document.addEventListener('click',e=>{
+    const go=e.target.closest('[data-go]'); if(go) showScreen(go.dataset.go);
+    const b=e.target.closest('[data-back]'); if(b) back();
+  });
+  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.tab)));
+
+  // role
+  document.querySelectorAll('.role-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    state.role=btn.dataset.role;
+    document.querySelectorAll('.role-btn').forEach(x=>x.className='role-btn rounded-3xl border border-slate-200 bg-white p-4 text-left');
+    btn.className='role-btn rounded-3xl border-2 border-[#ff8a00] bg-orange-50 p-4 text-left';
+  }));
+  // code timer
+  document.getElementById('codeBtn').addEventListener('click',function(){
+    let n=30; this.disabled=true; const self=this; self.textContent=`${n}s`;
+    const timer=setInterval(()=>{n--; self.textContent=n?`${n}s`:'重新获取'; if(!n){clearInterval(timer);self.disabled=false;}},1000);
+  });
+
+  // subjects
+  document.querySelectorAll('.subject').forEach(btn=>btn.addEventListener('click',()=>{
+    const s=btn.dataset.subject;
+    if(state.subjects.includes(s)) state.subjects=state.subjects.filter(x=>x!==s);
+    else if(state.subjects.length<3) state.subjects.push(s); else return toast('最多选择 3 门科目');
+    btn.classList.toggle('active');
+    if(btn.classList.contains('active')){
+      btn.className='subject active rounded-xl border border-orange-200 bg-orange-50 py-3 text-sm text-[#ff8a00]';
+    }else{
+      btn.className='subject rounded-xl border border-slate-200 py-3 text-sm text-slate-500';
+    }
+  }));
+  document.querySelectorAll('.city').forEach(btn=>btn.addEventListener('click',()=>{
+    const c=btn.dataset.city;
+    if(state.cities.includes(c)) state.cities=state.cities.filter(x=>x!==c); else state.cities.push(c);
+    btn.classList.toggle('bg-orange-50'); btn.classList.toggle('text-[#ff8a00]'); btn.classList.toggle('bg-slate-100');
+  }));
+  document.getElementById('saveProfile').addEventListener('click',()=>{
+    state.province=document.getElementById('province').value;
+    state.score=Number(document.getElementById('score').value||0);
+    safeStore(state);
+    renderProfile(); showScreen('home'); toast('升学档案已保存');
+  });
+
+  // search
+  const searchInput=document.getElementById('globalSearch');
+  document.querySelectorAll('.search-tag').forEach(t=>t.addEventListener('click',()=>{searchInput.value=t.textContent; searchInput.dispatchEvent(new Event('input'));}));
+  searchInput.addEventListener('input',()=>{document.getElementById('searchResults').style.opacity=searchInput.value.trim()?1:.65;});
+
+  // quiz
+  const quiz=[
+    {cat:'兴趣偏好',q:'如果有一整天自由时间，你更愿意做哪类事情？',o:['拆解复杂问题并找到规律','设计一个作品表达想法','和朋友组织一次活动','学习一种新工具或技能']},
+    {cat:'工作方式',q:'面对重要任务时，你更接近哪种状态？',o:['先制定计划再执行','边做边调整','先和别人讨论','先收集足够信息']},
+    {cat:'决策倾向',q:'当两个选择都不错时，你更看重什么？',o:['长期收益','个人兴趣','稳定安全','他人认可']},
+    {cat:'能力偏好',q:'你最愿意持续提升哪一种能力？',o:['数据与逻辑分析','表达与创意','组织与领导','沟通与服务']},
+    {cat:'职业价值',q:'理想工作最重要的是？',o:['成长空间和挑战','收入水平','稳定与保障','影响力与成就感']}
+  ];
+  let qi=0, answers=[];
+  function renderQuiz(){
+    const item=quiz[qi];
+    document.getElementById('quizProgressText').textContent=`${qi+1} / ${quiz.length}`;
+    document.getElementById('quizBar').style.width=`${(qi+1)/quiz.length*100}%`;
+    document.getElementById('quizCategory').textContent=item.cat;
+    document.getElementById('quizQuestion').textContent=item.q;
+    const box=document.getElementById('quizOptions'); box.innerHTML='';
+    item.o.forEach((opt,i)=>{
+      const b=document.createElement('button');
+      b.className='w-full rounded-2xl border border-slate-200 p-4 text-left text-sm active:scale-[.99]';
+      b.textContent=`${String.fromCharCode(65+i)}. ${opt}`;
+      b.onclick=()=>{answers[qi]=i; if(qi<quiz.length-1){qi++;renderQuiz();}else{showScreen('result');toast('测评完成，已生成职业画像');}};
+      box.appendChild(b);
+    });
+  }
+  document.getElementById('startQuiz').addEventListener('click',()=>{qi=0;answers=[];renderQuiz();showScreen('quiz');});
+  document.getElementById('quitQuiz').addEventListener('click',()=>{showScreen('assessment');});
+
+  // trend filter
+  document.querySelectorAll('.trend-filter').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('.trend-filter').forEach(x=>x.className='trend-filter rounded-full bg-white px-4 py-2 text-xs');
+    btn.className='trend-filter rounded-full bg-[#ff8a00] px-4 py-2 text-xs text-white';
+    const f=btn.dataset.filter;
+    document.querySelectorAll('.trend-card').forEach(card=>card.classList.toggle('hidden',f!=='all'&&!card.dataset.tags.includes(f)));
+  }));
+
+  // likes
+  document.querySelectorAll('[data-like]').forEach(b=>b.addEventListener('click',()=>{
+    b.classList.toggle('text-[#ff8a00]'); toast(b.classList.contains('text-[#ff8a00]')?'已收藏':'已取消收藏');
+  }));
+
+  // prefs
+  document.querySelectorAll('.pref').forEach(b=>b.addEventListener('click',()=>{
+    b.classList.toggle('active');
+    b.className=b.classList.contains('active')?'pref active rounded-full bg-orange-50 text-[#ff8a00] px-3 py-2 text-xs':'pref rounded-full bg-slate-100 px-3 py-2 text-xs';
+  }));
+  document.getElementById('generatePlan').addEventListener('click',()=>{
+    const btn=document.getElementById('generatePlan'); const old=btn.innerHTML;
+    btn.innerHTML='<span class="animate-pulse">AI 正在计算院校、专业、位次与职业匹配...</span>'; btn.disabled=true;
+    setTimeout(()=>{btn.innerHTML=old;btn.disabled=false;showScreen('plan');toast('已生成 96 个志愿建议');lucide.createIcons();},900);
+  });
+
+  // plan filters
+  document.querySelectorAll('.plan-filter').forEach(btn=>btn.addEventListener('click',()=>{
+    const f=btn.dataset.plan;
+    document.querySelectorAll('[data-plan-card]').forEach(c=>c.classList.toggle('hidden',c.dataset.planCard!==f));
+    setTimeout(()=>document.querySelectorAll('[data-plan-card]').forEach(c=>c.classList.remove('hidden')),1800);
+    toast(`已优先展示“${f==='rush'?'冲':f==='steady'?'稳':'保'}”档院校`);
+  }));
+
+  // volunteer add/export
+  document.getElementById('addVolunteer').addEventListener('click',()=>{
+    const list=document.getElementById('volunteerList');
+    const d=document.createElement('div'); d.className='vol-item rounded-2xl bg-white p-4 shadow-sm flex items-center gap-3';
+    d.innerHTML=`<span class="w-8 h-8 rounded-full bg-slate-100 grid place-items-center text-xs">04</span><div class="flex-1"><div class="text-sm font-semibold">山东科技大学</div><div class="text-xs text-slate-400 mt-1">软件工程</div></div><span class="text-xs text-blue-600">保</span><button class="remove-vol text-slate-300">×</button>`;
+    list.appendChild(d); d.querySelector('.remove-vol').onclick=()=>d.remove(); toast('已添加 1 个志愿');
+  });
+  document.getElementById('exportBtn').addEventListener('click',()=>{
+    const text=[...document.querySelectorAll('#volunteerList .vol-item')].map((el,i)=>`${i+1}. ${el.innerText.replace(/\n/g,' · ')}`).join('\n');
+    const blob=new Blob(['高考择学通 · 我的志愿表\n\n'+text],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='我的志愿表.txt';a.click();URL.revokeObjectURL(a.href);toast('志愿表已导出');
+  });
+
+  // chat
+  const chat=document.getElementById('chat'), input=document.getElementById('chatInput');
+  function sendMsg(msg){
+    if(!msg.trim())return;
+    const u=document.createElement('div');u.className='flex justify-end';u.innerHTML=`<div class="max-w-[270px] rounded-[22px] rounded-tr-md bg-slate-900 p-4 text-sm leading-6 text-white">${msg}</div>`;chat.appendChild(u);
+    input.value='';
+    setTimeout(()=>{
+      let ans='结合你的 582 分、山东、物化生和计算机方向偏好，我建议先看录取概率，再结合专业匹配度和未来职业趋势，不要只看学校名气。';
+      if(msg.includes('冲稳保')) ans='“冲”是略高于当前位次的尝试，“稳”是录取概率较高且专业匹配较好的选择，“保”用于控制滑档风险。建议三档都保留足够数量。';
+      if(msg.includes('就业')) ans='不要只看当前热度。建议同时看行业增长、岗位数量、技能门槛、薪资分布和你自身匹配度，再决定是否把它作为长期专业方向。';
+      const a=document.createElement('div');a.className='flex gap-3';a.innerHTML=`<div class="w-9 h-9 rounded-xl bg-[#ff8a00] text-white text-xs grid place-items-center font-bold">AI</div><div class="max-w-[270px] rounded-[22px] rounded-tl-md bg-white p-4 text-sm leading-6 shadow-sm">${ans}</div>`;chat.appendChild(a);a.scrollIntoView({behavior:'smooth',block:'end'});
+    },500);
+  }
+  document.getElementById('sendChat').addEventListener('click',()=>sendMsg(input.value));
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg(input.value);});
+  document.querySelectorAll('.quick-q').forEach(b=>b.addEventListener('click',()=>sendMsg(b.textContent)));
+
+  // booking
+  document.querySelectorAll('.date-btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.date-btn').forEach(x=>x.className='date-btn rounded-2xl bg-slate-50 py-3');b.className='date-btn active rounded-2xl bg-[#ff8a00] text-white py-3';}));
+  document.querySelectorAll('.time-btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.time-btn').forEach(x=>x.className='time-btn rounded-xl border border-slate-200 py-3');b.className='time-btn active rounded-xl border-2 border-[#ff8a00] bg-orange-50 text-[#ff8a00] py-3';}));
+  document.getElementById('confirmBooking').addEventListener('click',()=>{toast('预约成功，已加入“我的预约”');showScreen('me');});
+
+  document.getElementById('buyVip').addEventListener('click',()=>{state.vip=true;safeStore(state);toast('VIP 已开通（原型模拟）');setTimeout(()=>showScreen('me'),700);});
+
+  // restore
+  try{
+    const saved=JSON.parse(localStorage.getItem('gkzt_state')||'null');
+    if(saved) Object.assign(state,saved);
+  }catch(e){}
+  renderProfile();
+  lucide.createIcons();
+</script>
+</body>
+</html>

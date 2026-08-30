@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icare - 周大福生态综合平台</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ctf: {
+                            red: '#8B0000', // 品牌深红
+                            bright: '#E11D48', 
+                            bg: '#F8F9FA',
+                            gold: '#C5A065', // 财富金
+                            amber: '#F59E0B', 
+                            black: '#1C1C1C',
+                            green: '#059669',
+                            teal: '#14B8A6',
+                            navy: '#1E3A8A'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'PingFang SC', '-apple-system', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out',
+                        'slide-in-right': 'slideInRight 0.3s ease-out',
+                        'pulse-gold': 'pulseGold 2s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideInRight: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(0)' },
+                        },
+                        pulseGold: {
+                            '0%, 100%': { boxShadow: '0 0 0 0 rgba(197, 160, 101, 0.4)' },
+                            '50%': { boxShadow: '0 0 0 10px rgba(197, 160, 101, 0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .iphone-frame {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 12px solid #2d2d2d;
+            border-radius: 50px;
+            overflow: hidden;
+            height: 100vh;
+            max-height: 850px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+            background: #F8F9FA;
+        }
+        .active-scale:active { transform: scale(0.95); transition: transform 0.1s; }
+        
+        .gold-shimmer {
+            background: linear-gradient(45deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 60%);
+            background-size: 200% 200%;
+            animation: shimmer 3s infinite;
+        }
+        .card-locked { filter: grayscale(100%); opacity: 0.9; background: #2d2d2d; }
+        @keyframes shimmer { 0% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
+        .coupon-edge {
+            background-image: radial-gradient(circle at 0 50%, transparent 6px, #fff 7px);
+            background-size: 10px 100%;
+            background-position: 0 0;
+        }
+        .rich-text h4 { font-weight: bold; color: #1a1a1a; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .rich-text p { margin-bottom: 0.8rem; color: #555; font-size: 0.9rem; line-height: 1.6; }
+        .rich-text ul { list-style-type: disc; padding-left: 1.2rem; margin-bottom: 1rem; color: #555; font-size: 0.9rem; }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex items-center justify-center py-2 font-sans text-gray-800">
+
+    <div class="iphone-frame" x-data="appData()" x-cloak>
+
+        <div x-show="showSplash" 
+             x-transition:leave="transition ease-in duration-500 transform"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-full"
+             class="absolute inset-0 z-[100] bg-gradient-to-br from-ctf-red via-[#4a0404] to-black flex flex-col justify-between items-center text-white overflow-hidden">
+            
+            <div class="absolute top-0 left-0 w-64 h-64 bg-ctf-gold/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 right-0 w-80 h-80 bg-ctf-bright/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div>
+
+            <div class="flex-1 flex flex-col justify-center items-center animate-fade-in-up">
+                <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-[2rem] flex items-center justify-center shadow-2xl border border-white/20 mb-6 animate-float relative">
+                    <i class="fas fa-heart text-5xl text-ctf-bright absolute"></i>
+                    <i class="fas fa-gem text-2xl text-white absolute mt-1"></i> </div>
+                <h1 class="text-4xl font-extrabold tracking-widest mb-2">Icare</h1>
+                <p class="text-sm text-white/70 tracking-wider">港漂生活 · 财富赋能</p>
+            </div>
+
+            <div class="w-full px-8 pb-12 animate-fade-in-up" style="animation-delay: 0.3s;">
+                <button @click="enterApp()" class="w-full bg-gradient-to-r from-ctf-gold to-yellow-600 text-black font-bold py-4 rounded-full shadow-lg shadow-yellow-600/30 active:scale-95 transition-transform flex items-center justify-center">
+                    开启新篇章 <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+                <div class="mt-8 text-center opacity-40 text-[10px]">
+                    <p class="uppercase tracking-widest">Powered by</p>
+                    <p class="font-serif mt-1">CHOW TAI FOOK LIFE</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute top-12 left-0 w-full px-4 z-[90] pointer-events-none space-y-2">
+            <template x-for="toast in toasts" :key="toast.id">
+                <div x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0 -translate-y-4" class="bg-gray-900/90 backdrop-blur text-white px-4 py-3 rounded-xl shadow-lg flex items-center justify-between text-sm mx-auto w-fit max-w-[90%]"><div class="flex items-center"><i class="fas mr-2" :class="toast.icon"></i><span x-text="toast.message"></span></div></div>
+            </template>
+        </div>
+
+        <div class="h-12 bg-white/80 backdrop-blur flex justify-between items-center px-6 text-xs font-bold z-40 sticky top-0 border-b border-gray-100/50">
+            <span>9:41</span>
+            <div class="flex space-x-1.5 items-center"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><div class="w-6 h-3 bg-black rounded-[2px] relative ml-1"><div class="bg-white h-full w-[80%] absolute left-0 top-0"></div></div></div>
+        </div>
+
+        <main class="h-[calc(100%-140px)] overflow-y-auto no-scrollbar pb-24 bg-ctf-bg scroll-smooth" id="mainScroll">
+            
+            <div x-show="activeTab === 'home'" class="animate-fade-in-up">
+                <div class="px-5 pt-2 bg-white pb-4 rounded-b-[2rem] shadow-sm sticky top-0 z-30 transition-all">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <p class="text-gray-400 text-xs font-medium" x-text="'Hello, ' + userProfile.name.split(' ')[0]"></p>
+                            <h1 class="text-2xl font-extrabold text-ctf-black tracking-tight">探索 <span class="text-ctf-red">周大福</span> 生态圈</h1>
+                        </div>
+                        <div @click="activeTab = 'profile'" class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-ctf-gold cursor-pointer active-scale">
+                            <img :src="userProfile.avatar" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="relative group">
+                        <input type="text" x-model="searchQuery" placeholder="搜活动：打小人 / 抢包山 / 演唱会" class="w-full bg-gray-100 rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-ctf-gold/30 transition-all text-gray-700">
+                        <i class="fas fa-search absolute left-4 top-4 text-gray-400 group-focus-within:text-ctf-gold transition-colors"></i>
+                    </div>
+                </div>
+
+                <div class="flex overflow-x-auto space-x-3 px-5 py-6 no-scrollbar">
+                    <template x-for="cat in categories" :key="cat.id">
+                        <button @click="selectCategory(cat.id)" class="flex flex-col items-center space-y-2 min-w-[68px] group active-scale">
+                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-xl shadow-sm transition-all duration-300" :class="selectedCategory === cat.id ? 'bg-ctf-red text-white scale-105 shadow-md shadow-ctf-red/30' : 'bg-white text-gray-400 group-hover:bg-gray-50'"><i :class="cat.icon"></i></div>
+                            <span class="text-xs font-bold transition-colors" :class="selectedCategory === cat.id ? 'text-ctf-red' : 'text-gray-400'" x-text="cat.name"></span>
+                        </button>
+                    </template>
+                </div>
+
+                <div class="px-5 mb-6">
+                    <div class="flex justify-between items-end mb-4">
+                        <h2 class="text-lg font-bold flex items-center text-ctf-black"><span x-show="searchQuery === ''">独家精选 ✨</span><span x-show="searchQuery !== ''">搜索结果 🔍</span></h2>
+                    </div>
+                    <div class="space-y-5">
+                        <template x-for="event in filteredEvents" :key="event.id">
+                            <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group relative cursor-pointer" @click="openEvent(event)">
+                                <div class="relative h-48 overflow-hidden">
+                                    <img :src="event.image" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                                    <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-bold text-ctf-red shadow-sm flex items-center"><i class="fas fa-map-marker-alt mr-1"></i><span x-text="event.locationShort"></span></div>
+                                    <div x-show="event.benefit" class="absolute top-3 right-3 bg-gradient-to-r from-ctf-gold to-yellow-600 px-3 py-1 rounded-full text-[10px] text-white font-bold shadow-md"><i class="fas fa-gift mr-1"></i><span x-text="event.benefit"></span></div>
+                                    <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] text-white font-medium"><i class="fas fa-calendar mr-1"></i><span x-text="event.date"></span></div>
+                                </div>
+                                <div class="p-5">
+                                    <h3 class="font-bold text-lg text-gray-900 leading-snug mb-2" x-text="event.title"></h3>
+                                    <p class="text-gray-500 text-xs line-clamp-2 mb-4 leading-relaxed" x-text="event.summary"></p>
+                                    <div class="flex items-center justify-between border-t border-gray-100 pt-4">
+                                        <div class="flex -space-x-2 items-center"><template x-for="avatar in event.buddies"><img :src="avatar" class="w-7 h-7 rounded-full border-2 border-white object-cover ring-1 ring-gray-100"></template><div class="ml-3 text-xs text-gray-500 font-medium"><span class="text-ctf-red font-bold" x-text="event.buddyCount"></span> 位校友感兴趣</div></div>
+                                        <button @click.stop="triggerQuickJoin(event)" class="bg-gray-900 text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-ctf-red active:scale-95 transition-all flex items-center shadow-md">找搭子 <i class="fas fa-arrow-right ml-2"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="activeTab === 'buddy'" class="px-5 pt-6 animate-fade-in-up">
+                 <div class="flex justify-between items-center mb-6">
+                    <div><h1 class="text-2xl font-extrabold text-ctf-black">搭子匹配</h1><p class="text-xs text-gray-400 mt-1">基于学校、年级、兴趣智能推荐</p></div>
+                    <button class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-xs font-bold flex items-center border border-blue-100"><i class="fas fa-user-graduate mr-1.5"></i><span x-text="userProfile.university"></span></button>
+                </div>
+                <div class="flex space-x-2 mb-6 overflow-x-auto no-scrollbar"><template x-for="filter in buddyFilters" :key="filter"><button @click="activeBuddyFilter = filter" class="px-4 py-2 text-xs rounded-full whitespace-nowrap font-bold transition-all border flex-shrink-0" :class="activeBuddyFilter === filter ? 'bg-ctf-black text-white border-transparent shadow-md' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'"><span x-text="filter"></span></button></template></div>
+                <div class="space-y-4 pb-10">
+                    <template x-for="user in filteredUsers" :key="user.id">
+                        <div class="bg-white p-4 rounded-2xl flex items-center shadow-sm border border-gray-100 active:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden" @click="openChat(user)">
+                            <div class="absolute top-0 right-0 bg-yellow-50 text-yellow-700 text-[9px] font-bold px-2 py-1 rounded-bl-xl border-l border-b border-yellow-100" x-show="user.matchScore > 80"><i class="fas fa-bolt mr-1"></i>匹配度 <span x-text="user.matchScore"></span>%</div>
+                            <div class="relative"><img :src="user.avatar" class="w-14 h-14 rounded-full object-cover border border-gray-100"><div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white" :class="user.lastActive <= 15 ? 'bg-green-500' : 'bg-gray-300'"></div></div>
+                            <div class="ml-3 flex-1 overflow-hidden">
+                                <div class="flex justify-between items-center mt-1"><div class="flex items-center space-x-1.5"><h3 class="font-bold text-sm text-gray-800" x-text="user.name"></h3><i x-show="user.gender === 'female'" class="fas fa-venus text-pink-400 text-[10px]"></i><i x-show="user.gender === 'male'" class="fas fa-mars text-blue-400 text-[10px]"></i></div></div>
+                                <div class="flex items-center text-xs text-gray-500 mt-1 space-x-2"><span class="bg-gray-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-gray-600" x-text="user.school"></span><span class="bg-gray-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-gray-600" x-text="user.grade"></span></div>
+                                <div class="mt-2 text-xs truncate text-ctf-red font-medium"><i class="fas fa-heart text-[10px] mr-1"></i>想去: <span x-text="user.interest"></span></div>
+                            </div>
+                            <button @click.stop="openChat(user)" class="ml-2 w-10 h-10 rounded-full bg-ctf-red/10 text-ctf-red flex items-center justify-center hover:bg-ctf-red hover:text-white transition-all active:scale-90 shadow-sm"><i class="fas fa-comment-alt text-xs"></i></button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <div x-show="activeTab === 'finance'" class="animate-fade-in-up bg-gray-50 min-h-full">
+                <div class="px-5 pt-6 pb-24">
+                    <div class="flex justify-between items-center mb-6">
+                        <div><h1 class="text-2xl font-extrabold text-ctf-gold">财富赋权 <span class="text-xs bg-ctf-green/10 text-ctf-green px-2 py-0.5 rounded ml-2">ESG Core</span></h1><p class="text-xs text-gray-400 mt-1">周大福人寿 · 留学生专属计划</p></div>
+                        <div class="text-right cursor-pointer group" @click="activeTab = 'profile'; activeProfilePage = 'wallet'"><div class="text-xs text-gray-400 flex items-center justify-end">当前积分 <i class="fas fa-chevron-right text-[10px] ml-1 group-hover:translate-x-1 transition-transform"></i></div><div class="font-bold text-lg text-ctf-gold" x-text="userPoints.toLocaleString()"></div></div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-gray-100 mb-6 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-ctf-gold/10 rounded-full -mr-10 -mt-10 group-hover:scale-125 transition-transform duration-500"></div>
+                        <div class="flex justify-between items-start relative z-10"><div><h3 class="font-bold text-lg text-gray-800">未来储蓄 · 奶茶计划 🧋</h3><p class="text-xs text-gray-500 mt-1">坚持打卡，积少成多</p></div><div class="bg-ctf-red text-white text-[10px] px-2 py-1 rounded-lg font-bold shadow animate-bounce" x-show="streakDays > 0">连签 <span x-text="streakDays"></span> 天 🔥</div></div>
+                        <div class="mt-4 flex justify-between items-center px-1"><template x-for="day in 5"><div class="flex flex-col items-center"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300" :class="streakDays >= day ? 'bg-ctf-gold text-white border-ctf-gold shadow-md scale-110' : 'bg-gray-100 text-gray-400 border-gray-200'"><i class="fas fa-check" x-show="streakDays >= day"></i><span x-show="streakDays < day" x-text="day"></span></div><span class="text-[9px] mt-1 text-gray-400" x-text="'+' + (day * 10)"></span></div></template></div>
+                        <div class="mt-6 flex space-x-3"><button @click="deposit()" class="flex-1 bg-ctf-black text-white py-2.5 rounded-xl text-xs font-bold shadow-md hover:bg-gray-800 active:scale-95 transition-all flex items-center justify-center relative overflow-hidden"><i class="fas fa-piggy-bank mr-2 text-pink-300"></i> 存一杯 (HKD 30)<div class="absolute inset-0 bg-white/20 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700"></div></button><button class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-xs font-bold hover:bg-gray-50">查看收益</button></div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-amber-50 to-white rounded-3xl p-5 shadow-sm border border-amber-100 mb-6 flex justify-between items-center relative overflow-hidden group cursor-pointer" @click="addToast('跳转至周大福人寿小程序...', 'loading')">
+                        <div class="z-10"><div class="flex items-center space-x-2"><h3 class="font-bold text-lg text-gray-800">Icare 财富</h3><i class="fas fa-coins text-ctf-gold"></i></div><p class="text-xs text-gray-500 mt-2 mb-1 max-w-[190px] leading-tight">将奶茶储蓄转化为长久保障<br><span class="font-bold text-ctf-red/90 mt-1.5 block text-xs">💎 「匠心·传承」储蓄寿险计划2(优越版)</span></p><button class="mt-3 text-xs font-bold text-ctf-gold flex items-center bg-white/80 px-2 py-1 rounded-lg w-fit shadow-sm border border-amber-50 hover:bg-white transition-colors">立即投保 <i class="fas fa-arrow-right ml-1 text-[10px]"></i></button></div>
+                        <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center text-3xl text-ctf-gold z-10"><i class="fas fa-chart-line"></i></div>
+                        <div class="absolute -right-4 -bottom-4 text-9xl text-amber-100/50 z-0 transform -rotate-12"><i class="fas fa-shield-alt"></i></div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-5 shadow-lg border border-gray-100 mb-6 relative overflow-hidden group">
+                        <div class="flex justify-between items-start relative z-10"><div><h3 class="font-bold text-lg text-gray-800">步步生金 · 健康计划 🏃</h3><p class="text-xs text-gray-500 mt-1">保持身体健康，积分抵扣医保</p></div><div class="bg-ctf-green text-white text-[10px] px-2 py-1 rounded-lg font-bold shadow">+20 积分</div></div>
+                        <div class="mt-6 flex items-end space-x-2"><span class="text-4xl font-extrabold text-gray-800">8,342</span><span class="text-xs text-gray-400 mb-1.5">/ 10,000 步</span></div>
+                        <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden mt-2"><div class="bg-gradient-to-r from-ctf-green to-teal-400 h-2.5 rounded-full" style="width: 83%"></div></div>
+                        <div class="mt-5"><button @click="syncSteps()" class="w-full bg-gray-900 text-white py-2.5 rounded-xl text-xs font-bold shadow-md hover:bg-ctf-green active:scale-95 transition-all flex items-center justify-center"><i class="fas fa-shoe-prints mr-2 text-teal-300"></i> 同步步数 (换积分)</button></div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-teal-50 to-white rounded-3xl p-5 shadow-sm border border-teal-100 mb-6 flex justify-between items-center relative overflow-hidden group">
+                        <div class="z-10"><div class="flex items-center space-x-2"><h3 class="font-bold text-lg text-gray-800">Icare 医保+</h3><i class="fas fa-user-md text-ctf-green"></i></div><p class="text-xs text-gray-500 mt-2 mb-1 max-w-[190px] leading-tight">将健康财富转化为永久保障<br><span class="font-bold text-ctf-green/90 mt-1.5 block text-xs">🏥 「悦康保」医疗保障计划</span></p><button @click="addToast('跳转至投保页面...', 'loading')" class="mt-3 text-xs font-bold text-ctf-green flex items-center bg-white/80 px-2 py-1 rounded-lg w-fit shadow-sm border border-teal-50 hover:bg-white transition-colors">立即投保 <i class="fas fa-arrow-right ml-1 text-[10px]"></i></button></div>
+                        <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center text-3xl text-ctf-green z-10"><i class="fas fa-heartbeat"></i></div>
+                        <div class="absolute -right-4 -bottom-4 text-9xl text-teal-100/50 z-0 transform -rotate-12"><i class="fas fa-hospital-alt"></i></div>
+                    </div>
+
+                    <div class="mb-6"><div class="flex justify-between items-end mb-3"><h3 class="font-bold text-gray-900">精选财富讲座</h3><span class="text-xs text-gray-400">线下交流</span></div><div class="flex space-x-4 overflow-x-auto no-scrollbar pb-2"><template x-for="lecture in lectures"><div class="flex-shrink-0 w-64 bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col justify-between cursor-pointer group hover:shadow-md transition-all" @click="openEvent(lecture)"><div class="flex space-x-3 mb-3"><div class="w-16 h-16 rounded-xl bg-gray-200 flex-shrink-0 overflow-hidden relative"><img :src="lecture.image" class="w-full h-full object-cover"><div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[9px] px-1 py-0.5 text-center truncate" x-text="lecture.tag"></div></div><div class="flex-1"><h4 class="font-bold text-sm text-gray-900 line-clamp-2 leading-tight" x-text="lecture.title"></h4><p class="text-[10px] text-gray-500 mt-1 line-clamp-2" x-text="lecture.desc"></p></div></div><div class="flex justify-between items-end border-t border-gray-50 pt-2"><span class="text-[9px] text-ctf-red bg-red-50 px-2 py-0.5 rounded font-bold" x-text="lecture.benefit"></span><div class="text-[10px] text-gray-400" x-text="lecture.date.split(' ')[0]"></div></div></div></template></div></div>
+
+                    <div class="mb-6"><div class="flex justify-between items-end mb-3"><h3 class="font-bold text-gray-900">财富学院 <span class="text-[10px] text-gray-400 font-normal ml-1">学习领积分</span></h3><span class="text-xs text-ctf-gold font-bold">查看全部</span></div><div class="flex space-x-3 overflow-x-auto no-scrollbar pb-2"><div class="flex-shrink-0 w-40 bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer" @click="addToast('开始播放课程...', 'info')"><div class="h-24 bg-gray-200 relative"><img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover"><div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors"><i class="fas fa-play-circle text-white text-2xl drop-shadow-md"></i></div></div><div class="p-3"><h4 class="font-bold text-xs text-gray-800 line-clamp-1">留学生如何建立信用？</h4><div class="flex justify-between items-center mt-2"><span class="text-[10px] text-gray-400">5 min</span><span class="text-[10px] text-ctf-gold font-bold">+20 pts</span></div></div></div><div class="flex-shrink-0 w-40 bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer" @click="addToast('开始播放课程...', 'info')"><div class="h-24 bg-gray-200 relative"><img src="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover"><div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors"><i class="fas fa-play-circle text-white text-2xl drop-shadow-md"></i></div></div><div class="p-3"><h4 class="font-bold text-xs text-gray-800 line-clamp-1">大湾区投资基础课</h4><div class="flex justify-between items-center mt-2"><span class="text-[10px] text-gray-400">12 min</span><span class="text-[10px] text-ctf-gold font-bold">+50 pts</span></div></div></div></div></div>
+
+                    <div class="bg-gradient-to-br from-ctf-navy to-blue-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden mb-6">
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start">
+                                <div><h3 class="font-bold text-lg">CTF Life 金融人才计划</h3><p class="text-xs text-blue-200 mt-1">财富管理部 & 精算部 · 联合招募</p></div>
+                                <div class="bg-white/20 backdrop-blur px-2 py-1 rounded text-[10px] font-bold">提供实习证明</div>
+                            </div>
+                            <div class="mt-6 flex space-x-3 overflow-x-auto no-scrollbar pb-2">
+                                <template x-for="job in internships">
+                                    <div class="flex-shrink-0 w-32 bg-white/10 backdrop-blur border border-white/20 rounded-xl p-3 flex flex-col justify-between h-28 cursor-pointer hover:bg-white/20 transition-colors" @click="openInternship(job)">
+                                        <div><div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mb-2"><i :class="job.icon" class="text-sm"></i></div><h4 class="font-bold text-xs leading-tight" x-text="job.title"></h4></div>
+                                        <span class="text-[9px] text-blue-200" x-text="job.type"></span>
+                                    </div>
+                                </template>
+                            </div>
+                            <button class="w-full mt-4 bg-white text-ctf-navy py-2.5 rounded-xl text-xs font-bold flex items-center justify-center">查看所有机会 <i class="fas fa-arrow-right ml-2"></i></button>
+                        </div>
+                        <div class="absolute -right-10 -bottom-10 text-9xl text-white/5 opacity-50"><i class="fas fa-briefcase"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="activeTab === 'moments'" class="animate-fade-in-up bg-gray-50 min-h-full">
+                <div class="bg-white px-5 pt-6 pb-2 sticky top-0 z-30 shadow-sm rounded-b-3xl">
+                     <div class="flex justify-between items-center mb-4"><h1 class="text-2xl font-extrabold text-ctf-black">社区 <span class="text-ctf-gold text-sm ml-1 font-medium bg-yellow-50 px-2 py-0.5 rounded-lg border border-yellow-100"><i class="fas fa-coins mr-1"></i>89</span></h1><div class="flex space-x-1 bg-gray-100 p-1 rounded-xl"><button @click="activeCommunityTab = 'recommend'" class="px-3 py-1 text-xs font-bold rounded-lg transition-all" :class="activeCommunityTab === 'recommend' ? 'bg-white text-black shadow-sm' : 'text-gray-400 hover:text-gray-600'">推荐</button><button @click="activeCommunityTab = 'school'" class="px-3 py-1 text-xs font-bold rounded-lg transition-all" :class="activeCommunityTab === 'school' ? 'bg-white text-black shadow-sm' : 'text-gray-400 hover:text-gray-600'">同校</button></div></div><div class="flex space-x-3 overflow-x-auto no-scrollbar pb-3"><template x-for="topic in topics"><div class="flex-shrink-0 w-28 h-14 rounded-xl relative overflow-hidden flex items-center justify-center text-white font-bold text-xs cursor-pointer active-scale" :class="topic.bg"><span class="z-10 relative drop-shadow-md" x-text="topic.name"></span><div class="absolute inset-0 bg-black/10 hover:bg-black/0 transition-colors"></div></div></template></div>
+                </div>
+                 <div class="px-3 pt-4 columns-2 gap-3 space-y-3 pb-20"><template x-for="post in filteredCommunityPosts" :key="post.id"><div class="break-inside-avoid bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer group" @click="openPost(post)"><div class="relative overflow-hidden"><img :src="post.image" class="w-full object-cover transform group-hover:scale-105 transition-transform duration-500" :class="post.heightClass"><div x-show="post.location" class="absolute bottom-2 left-2 bg-black/40 backdrop-blur px-2 py-1 rounded text-[10px] text-white flex items-center font-medium"><i class="fas fa-map-marker-alt mr-1"></i><span x-text="post.location"></span></div><div x-show="post.isSameSchool" class="absolute top-2 left-2 bg-blue-500 text-white px-2 py-0.5 rounded text-[9px] font-bold shadow-sm">HKU</div></div><div class="p-3"><h3 class="font-bold text-xs text-gray-800 leading-snug mb-2 line-clamp-2" x-text="post.title"></h3><div class="flex items-center justify-between"><div class="flex items-center"><img :src="post.avatar" class="w-5 h-5 rounded-full border border-gray-200"><span class="text-[10px] text-gray-500 ml-1 truncate max-w-[50px]" x-text="post.author"></span></div><button @click.stop="toggleLike(post)" class="flex items-center space-x-1 group/like"><i class="text-xs transition-transform group-active/like:scale-125" :class="post.liked ? 'fas fa-heart text-ctf-red' : 'far fa-heart text-gray-400'"></i><span class="text-[10px] text-gray-400" x-text="post.likes"></span></button></div></div></div></template></div>
+            </div>
+
+            <div x-show="activeTab === 'profile'" class="animate-fade-in-up relative h-full">
+                <div class="h-48 bg-gradient-to-br from-ctf-red to-ctf-black rounded-b-[3rem] relative overflow-hidden"><div class="absolute top-0 right-0 p-20 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div></div>
+                <div class="px-5 -mt-20 pb-20">
+                    <div class="bg-white rounded-3xl p-6 shadow-lg mb-6 relative z-10 flex flex-col justify-between min-h-[140px]">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center"><div class="relative"><img :src="userProfile.avatar" class="w-20 h-20 rounded-full object-cover border-4 border-gray-50 shadow-md"><div class="absolute bottom-0 right-0 bg-ctf-gold text-white text-[10px] px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm">Lv.3</div></div><div class="ml-4"><div class="flex items-center"><h2 class="text-xl font-bold text-gray-900" x-text="userProfile.name"></h2><i class="fas fa-venus text-pink-400 ml-2 text-sm" x-show="userProfile.gender === 'female'"></i><i class="fas fa-mars text-blue-400 ml-2 text-sm" x-show="userProfile.gender === 'male'"></i></div><div class="mt-2 flex flex-col space-y-1"><div class="flex items-center text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded w-fit"><i class="fas fa-university mr-1.5 text-gray-400"></i><span x-text="userProfile.university"></span></div><div class="flex items-center text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded w-fit"><i class="fas fa-graduation-cap mr-1.5 text-gray-400"></i><span x-text="userProfile.degree"></span></div></div></div></div>
+                            <button @click="openEditProfile()" class="text-gray-400 hover:text-gray-600 p-2"><i class="far fa-edit"></i></button>
+                        </div>
+                        <div class="flex justify-around mt-6 pt-4 border-t border-gray-100"><div class="text-center w-1/3 border-r border-gray-100"><div class="font-bold text-lg text-gray-900">12</div><div class="text-[10px] text-gray-400">关注</div></div><div class="text-center w-1/3 border-r border-gray-100"><div class="font-bold text-lg text-gray-900">5</div><div class="text-[10px] text-gray-400">粉丝</div></div><div class="text-center w-1/3"><div class="font-bold text-lg text-gray-900">889</div><div class="text-[10px] text-gray-400">获赞</div></div></div>
+                    </div>
+                    <div @click="openProfilePage('membership')" class="bg-gradient-to-r from-gray-900 to-black rounded-2xl p-5 text-ctf-gold shadow-xl mb-6 relative overflow-hidden cursor-pointer active:scale-95 transition-transform gold-shimmer border border-gray-700">
+                        <div class="flex justify-between items-start z-10 relative"><div><div class="text-[10px] tracking-widest uppercase mb-1">CTF Membership</div><div class="font-bold text-lg italic">VIP Gold</div></div><i class="fas fa-crown text-2xl"></i></div>
+                        <div class="mt-4 flex justify-between items-end z-10 relative"><div class="text-xs text-white/50">NO. 8839 2039 1029</div><div class="text-xs font-bold bg-white/10 px-2 py-1 rounded backdrop-blur">查看权益 ></div></div>
+                    </div>
+                    <div class="bg-white rounded-3xl p-5 shadow-sm">
+                        <h3 class="font-bold text-gray-800 mb-4 text-sm">常用功能</h3>
+                        <div class="grid grid-cols-4 gap-y-6">
+                            <button @click="openProfilePage('wallet')" class="flex flex-col items-center space-y-2 group"><div class="w-10 h-10 rounded-full bg-yellow-50 text-ctf-gold flex items-center justify-center text-lg group-hover:bg-yellow-100 transition-colors"><i class="fas fa-wallet"></i></div><span class="text-xs text-gray-600">钱包</span></button>
+                            <button @click="openProfilePage('tickets')" class="flex flex-col items-center space-y-2 group"><div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center text-lg group-hover:bg-orange-100 transition-colors"><i class="fas fa-ticket-alt"></i></div><span class="text-xs text-gray-600">票务</span></button>
+                            <button @click="openProfilePage('wishlist')" class="flex flex-col items-center space-y-2 group"><div class="w-10 h-10 rounded-full bg-red-50 text-ctf-red flex items-center justify-center text-lg group-hover:bg-red-100 transition-colors"><i class="fas fa-heart"></i></div><span class="text-xs text-gray-600">心愿单</span></button>
+                            <button @click="openProfilePage('verify')" class="flex flex-col items-center space-y-2 group"><div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-lg group-hover:bg-blue-100 transition-colors"><i class="fas fa-id-card"></i></div><span class="text-xs text-gray-600">认证</span></button>
+                            <button @click="addToast('客服连接中...', 'loading')" class="flex flex-col items-center space-y-2 group"><div class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center text-lg group-hover:bg-gray-100 transition-colors"><i class="fas fa-headset"></i></div><span class="text-xs text-gray-600">客服</span></button>
+                            <button @click="openProfilePage('settings')" class="flex flex-col items-center space-y-2 group"><div class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center text-lg group-hover:bg-gray-100 transition-colors"><i class="fas fa-sliders-h"></i></div><span class="text-xs text-gray-600">设置</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <nav class="absolute bottom-0 w-full bg-white border-t border-gray-100 h-[88px] rounded-b-[40px] px-2 pt-3 z-[40]">
+             <div class="flex justify-between items-start px-2">
+                <button @click="activeTab = 'home'" class="flex flex-col items-center w-12 space-y-1 group active-scale"><i class="text-xl transition-colors duration-300" :class="activeTab === 'home' ? 'fas fa-compass text-ctf-red' : 'far fa-compass text-gray-400 group-hover:text-gray-600'"></i><span class="text-[9px] font-medium" :class="activeTab === 'home' ? 'text-ctf-red' : 'text-gray-400'">首页</span></button>
+                <button @click="activeTab = 'buddy'" class="flex flex-col items-center w-12 space-y-1 group active-scale"><div class="relative"><i class="text-xl transition-colors duration-300" :class="activeTab === 'buddy' ? 'fas fa-comment-dots text-ctf-red' : 'far fa-comment-dots text-gray-400 group-hover:text-gray-600'"></i><span class="absolute -top-0.5 -right-1 w-2 h-2 bg-ctf-red rounded-full border border-white"></span></div><span class="text-[9px] font-medium" :class="activeTab === 'buddy' ? 'text-ctf-red' : 'text-gray-400'">搭子</span></button>
+                <button @click="activeTab = 'finance'" class="flex flex-col items-center w-14 -mt-6 group active-scale"><div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg border-4 border-[#F8F9FA] transition-all" :class="activeTab === 'finance' ? 'bg-ctf-gold text-white scale-110' : 'bg-gray-900 text-white'"><i class="fas fa-piggy-bank text-lg"></i></div><span class="text-[9px] font-bold mt-1" :class="activeTab === 'finance' ? 'text-ctf-gold' : 'text-gray-400'">财富</span></button>
+                <button @click="activeTab = 'moments'" class="flex flex-col items-center w-12 space-y-1 group active-scale"><i class="text-xl transition-colors duration-300" :class="activeTab === 'moments' ? 'fas fa-images text-ctf-red' : 'far fa-images text-gray-400 group-hover:text-gray-600'"></i><span class="text-[9px] font-medium" :class="activeTab === 'moments' ? 'text-ctf-red' : 'text-gray-400'">社区</span></button>
+                <button @click="activeTab = 'profile'" class="flex flex-col items-center w-12 space-y-1 group active-scale"><i class="text-xl transition-colors duration-300" :class="activeTab === 'profile' ? 'fas fa-user text-ctf-red' : 'far fa-user text-gray-400 group-hover:text-gray-600'"></i><span class="text-[9px] font-medium" :class="activeTab === 'profile' ? 'text-ctf-red' : 'text-gray-400'">我的</span></button>
+            </div>
+            <button @click="openCreateModal()" class="absolute -top-16 right-4 w-10 h-10 bg-ctf-red text-white rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform z-50"><i class="fas fa-plus"></i></button>
+            <div class="w-1/3 h-1 bg-gray-300 rounded-full mx-auto mt-5"></div>
+        </nav>
+
+        <div x-show="showInternshipModal" style="display: none;" class="absolute inset-0 z-[80] bg-black/60 flex items-end backdrop-blur-sm">
+            <div class="bg-white w-full rounded-t-[2.5rem] h-[90%] relative flex flex-col shadow-2xl animate-fade-in-up" @click.away="showInternshipModal = false">
+                <div class="px-6 py-6 border-b border-gray-100 flex justify-between items-start">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2"><span class="bg-blue-100 text-ctf-navy px-2 py-0.5 rounded text-[10px] font-bold">校招/实习</span><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold">可转正</span></div>
+                        <h2 class="text-xl font-bold text-gray-900 leading-tight" x-text="currentInternship?.title"></h2>
+                        <div class="text-xs text-gray-500 mt-2 flex items-center space-x-3"><span><i class="fas fa-building mr-1"></i><span x-text="currentInternship?.department"></span></span><span><i class="fas fa-map-marker-alt mr-1"></i><span x-text="currentInternship?.location"></span></span></div>
+                    </div>
+                    <button @click="showInternshipModal = false" class="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center text-gray-500"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-6 no-scrollbar">
+                    <div class="mb-6"><h4 class="font-bold text-gray-900 mb-2">职位描述</h4><div class="text-sm text-gray-600 leading-relaxed rich-text" x-html="currentInternship?.desc"></div></div>
+                    <div class="mb-6"><h4 class="font-bold text-gray-900 mb-2">任职要求</h4><div class="text-sm text-gray-600 leading-relaxed rich-text" x-html="currentInternship?.requirements"></div></div>
+                    <div class="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-ctf-navy mb-2 flex items-center"><i class="fas fa-rocket mr-2"></i>成长与收获</h4><div class="text-sm text-gray-600 leading-relaxed rich-text" x-html="currentInternship?.growth"></div></div>
+                    <div class="mb-20"><h4 class="font-bold text-gray-900 mb-2">福利待遇</h4><div class="flex flex-wrap gap-2"><span class="bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-lg text-xs text-gray-600">提供实习证明</span><span class="bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-lg text-xs text-gray-600">导师一对一</span><span class="bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-lg text-xs text-gray-600">有转正机会</span></div></div>
+                </div>
+                <div class="absolute bottom-0 w-full p-5 bg-white border-t border-gray-100 shadow-lg"><button @click="addToast('简历投递成功！HR将尽快联系您', 'success'); showInternshipModal = false" class="w-full bg-ctf-navy text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-blue-900 active:scale-95 transition-all">立即投递</button></div>
+            </div>
+        </div>
+
+        <div x-show="showSplash" x-transition:leave="transition ease-in duration-500 transform" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-full" class="absolute inset-0 z-[100] bg-gradient-to-br from-ctf-red via-[#4a0404] to-black flex flex-col justify-between items-center text-white overflow-hidden"><div class="absolute top-0 left-0 w-64 h-64 bg-ctf-gold/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div><div class="absolute bottom-0 right-0 w-80 h-80 bg-ctf-bright/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div><div class="flex-1 flex flex-col justify-center items-center animate-fade-in-up"><div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-[2rem] flex items-center justify-center shadow-2xl border border-white/20 mb-6 animate-float relative"><i class="fas fa-heart text-5xl text-ctf-bright absolute"></i><i class="fas fa-gem text-2xl text-white absolute mt-1"></i></div><h1 class="text-4xl font-extrabold tracking-widest mb-2">Icare</h1><p class="text-sm text-white/70 tracking-wider">港漂生活 · 财富赋能</p></div><div class="w-full px-8 pb-12 animate-fade-in-up" style="animation-delay: 0.3s;"><button @click="enterApp()" class="w-full bg-gradient-to-r from-ctf-gold to-yellow-600 text-black font-bold py-4 rounded-full shadow-lg shadow-yellow-600/30 active:scale-95 transition-transform flex items-center justify-center">开启新篇章 <i class="fas fa-arrow-right ml-2"></i></button><div class="mt-8 text-center opacity-40 text-[10px]"><p class="uppercase tracking-widest">Powered by</p><p class="font-serif mt-1">CHOW TAI FOOK LIFE</p></div></div></div>
+        <div x-show="showEditProfileModal" style="display: none;" class="absolute inset-0 z-[90] flex items-center justify-center"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showEditProfileModal = false"></div><div class="bg-white w-[85%] rounded-3xl p-6 relative z-10 shadow-2xl animate-fade-in-up"><h3 class="font-bold text-lg mb-4 text-center">编辑个人资料</h3><div class="space-y-4"><div class="flex justify-center mb-2"><div class="relative"><img :src="tempProfile.avatar" class="w-20 h-20 rounded-full object-cover border-2 border-ctf-red"><button class="absolute bottom-0 right-0 bg-gray-900 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs"><i class="fas fa-camera"></i></button></div></div><div><label class="text-xs text-gray-500 font-bold ml-1">昵称</label><input type="text" x-model="tempProfile.name" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm mt-1 focus:border-ctf-red outline-none"></div><div><label class="text-xs text-gray-500 font-bold ml-1">性别</label><select x-model="tempProfile.gender" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm mt-1 focus:border-ctf-red outline-none"><option value="male">男</option><option value="female">女</option></select></div><div><label class="text-xs text-gray-500 font-bold ml-1">大学</label><input type="text" x-model="tempProfile.university" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm mt-1 focus:border-ctf-red outline-none"></div><div><label class="text-xs text-gray-500 font-bold ml-1">学历</label><input type="text" x-model="tempProfile.degree" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm mt-1 focus:border-ctf-red outline-none"></div></div><div class="flex space-x-3 mt-6"><button @click="showEditProfileModal = false" class="flex-1 bg-gray-100 text-gray-600 py-2.5 rounded-xl text-sm font-bold">取消</button><button @click="saveProfile()" class="flex-1 bg-ctf-red text-white py-2.5 rounded-xl text-sm font-bold shadow-md">保存</button></div></div></div>
+        <div x-show="showRedeemModal" style="display: none;" class="absolute inset-0 z-[90] flex items-end"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showRedeemModal = false"></div><div class="bg-white w-full rounded-t-[2.5rem] h-[80%] relative flex flex-col shadow-2xl animate-fade-in-up z-20"><div class="flex items-center justify-between px-6 py-4 border-b border-gray-100"><h2 class="font-bold text-lg">积分兑换好礼</h2><button @click="showRedeemModal = false" class="text-gray-400"><i class="fas fa-times"></i></button></div><div class="flex-1 overflow-y-auto p-5 no-scrollbar space-y-4"><template x-for="item in rewardsList"><div class="flex bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-24"><div class="w-24 bg-gradient-to-br from-ctf-red to-pink-600 text-white flex flex-col items-center justify-center relative coupon-edge"><span class="text-xs opacity-80">优惠券</span><span class="font-bold text-xl" x-text="item.discount"></span></div><div class="flex-1 p-3 flex flex-col justify-between"><div><h4 class="font-bold text-sm text-gray-900 line-clamp-1" x-text="item.title"></h4><p class="text-[10px] text-gray-500 mt-1" x-text="item.desc"></p></div><div class="flex justify-between items-end"><span class="text-ctf-gold font-bold text-sm" x-text="item.points + ' 积分'"></span><button @click="redeemItem(item)" class="bg-black text-white text-xs px-3 py-1.5 rounded-full font-bold active:scale-95 transition-transform">兑换</button></div></div></div></template></div></div></div>
+        <div x-show="activeProfilePage !== null" style="display: none;" class="absolute inset-0 z-[80] bg-gray-100 flex flex-col h-full rounded-[40px] overflow-hidden" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
+            <div class="h-20 bg-white shadow-sm flex items-end pb-3 px-4 relative z-20"><button @click="activeProfilePage = null" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full"><i class="fas fa-arrow-left"></i></button><h2 class="font-bold text-lg text-gray-900 ml-4 mb-0.5" x-text="getProfilePageTitle()"></h2></div>
+            <div class="flex-1 overflow-y-auto p-5 no-scrollbar">
+                <div x-show="activeProfilePage === 'wallet'" class="space-y-4"><div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-6 text-white shadow-lg"><div class="text-xs opacity-80">当前金币余额</div><div class="text-4xl font-bold mt-1">8,890 <span class="text-sm font-normal">Coins</span></div><div class="mt-4 flex space-x-3"><button class="bg-white/20 backdrop-blur px-4 py-1.5 rounded-full text-xs font-bold">充值</button><button @click="showRedeemModal = true" class="bg-white text-orange-500 px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-gray-50 active:scale-95 transition-all">兑换好礼</button></div></div><div class="bg-white rounded-xl p-4"><h3 class="font-bold text-sm mb-3">最近明细</h3><div class="space-y-3"><div class="flex justify-between items-center text-sm border-b border-gray-50 pb-2"><div><div class="font-bold">发帖奖励</div><div class="text-xs text-gray-400">10-22 14:30</div></div><div class="text-orange-500 font-bold">+5</div></div><div class="flex justify-between items-center text-sm border-b border-gray-50 pb-2"><div><div class="font-bold">活动报名</div><div class="text-xs text-gray-400">10-21 09:00</div></div><div class="text-gray-800 font-bold">-20</div></div></div></div></div>
+                <div x-show="activeProfilePage === 'membership'" class="space-y-6"><div class="bg-black rounded-2xl p-8 text-ctf-gold shadow-2xl relative overflow-hidden border border-gray-700 h-56 flex flex-col justify-between"><div class="absolute inset-0 gold-shimmer opacity-20"></div><div class="flex justify-between items-start"><i class="fas fa-crown text-3xl"></i><div class="text-right"><div class="font-bold text-xl">K11 VIP</div><div class="text-xs opacity-60">GOLD CARD</div></div></div><div class="w-full flex justify-center my-2"><div class="bg-white p-1 rounded"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=CTF-VIP-888" class="w-20 h-20 opacity-90"></div></div><div class="text-xs text-center opacity-50 font-mono">8839 2039 1029 3920</div></div><div class="bg-white rounded-xl p-5 shadow-sm"><h3 class="font-bold text-gray-900 mb-3">家属副卡权益</h3><div class="space-y-3"><template x-for="family in familyCards"><div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl"><div class="flex items-center space-x-3"><div class="w-10 h-10 rounded-full bg-ctf-gold/20 text-ctf-gold flex items-center justify-center"><i class="fas fa-user"></i></div><div><div class="font-bold text-sm" x-text="family.name"></div><div class="text-xs text-gray-500" x-text="family.relation"></div></div></div><span class="text-xs text-green-500 font-bold">已激活</span></div></template><button @click="addFamilyMember()" class="w-full border-2 border-dashed border-gray-200 text-gray-400 py-3 rounded-xl text-sm font-bold flex items-center justify-center hover:border-ctf-gold hover:text-ctf-gold transition-colors"><i class="fas fa-plus mr-2"></i> 添加家属</button></div></div></div>
+                <div x-show="activeProfilePage === 'tickets'" class="space-y-4"><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex"><div class="w-24 bg-gray-200 relative"><img src="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" class="w-full h-full object-cover"></div><div class="flex-1 p-3"><div class="flex justify-between"><h3 class="font-bold text-sm line-clamp-1">Eason Chan 演唱会</h3><span class="text-xs text-green-500 font-bold">待使用</span></div><div class="text-xs text-gray-500 mt-1">10月20日 19:30 | 启德体育园</div><div class="mt-3 flex justify-between items-end"><div class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">座次: A区 3排 12号</div><button class="bg-black text-white px-3 py-1 rounded text-xs">出示票码</button></div></div></div><div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex opacity-60"><div class="w-24 bg-gray-200 relative"><img src="https://images.unsplash.com/photo-1570701564993-e00652af8aa7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" class="w-full h-full object-cover"></div><div class="flex-1 p-3"><div class="flex justify-between"><h3 class="font-bold text-sm line-clamp-1">K11 莫奈展</h3><span class="text-xs text-gray-500 font-bold">已核销</span></div><div class="text-xs text-gray-500 mt-1">10月15日 | K11 MUSEA</div></div></div></div>
+                <div x-show="activeProfilePage === 'wishlist'" class="space-y-4"><div class="bg-white rounded-xl p-3 flex space-x-3 shadow-sm" @click="addToast('跳转活动详情...', 'info')"><img src="https://images.unsplash.com/photo-1617038224531-ab5d78665b38?ixlib=rb-1.2.1&auto=format&fit=crop&w=150&q=80" class="w-20 h-20 rounded-lg object-cover"><div class="flex-1 flex flex-col justify-between"><h3 class="font-bold text-sm">CTF 金饰工艺体验课</h3><div class="flex justify-between items-center"><span class="text-xs text-gray-500">周日 14:00</span><i class="fas fa-heart text-ctf-red"></i></div></div></div></div>
+                <div x-show="activeProfilePage === 'verify'" class="pt-5"><div class="flex space-x-4 mb-8 bg-white p-1 rounded-xl shadow-sm mx-4"><button class="flex-1 py-2 text-sm font-bold rounded-lg transition-all bg-black text-white">我是留学生</button><button class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-400 hover:bg-gray-50" @click="addToast('优才通道暂未开放', 'info')">我是优才/高才</button></div><div class="text-center" x-show="!userProfile.verified"><div class="w-24 h-24 bg-gray-100 text-gray-300 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border-2 border-dashed border-gray-300"><i class="fas fa-id-card"></i></div><h3 class="font-bold text-xl">尚未认证</h3><p class="text-gray-500 text-sm mt-2 px-10">认证后解锁 CTF 黑金会员权益、校友搭子匹配功能</p><button @click="verifyUser()" class="mt-8 bg-ctf-red text-white px-10 py-3 rounded-full font-bold shadow-lg shadow-red-200">立即认证 (上传学生证)</button></div><div class="text-center" x-show="userProfile.verified"><div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4"><i class="fas fa-check"></i></div><h3 class="font-bold text-xl">已完成学生认证</h3><p class="text-gray-500 text-sm mt-2">有效期至: 2026-09-01</p><div class="bg-white rounded-xl p-4 mt-8 text-left shadow-sm mx-4"><div class="text-xs text-gray-400">认证信息</div><div class="font-bold mt-1" x-text="userProfile.university"></div><div class="text-sm mt-1" x-text="userProfile.degree"></div></div></div></div>
+                <div x-show="activeProfilePage === 'settings'" class="bg-white rounded-xl overflow-hidden shadow-sm"><div class="p-4 flex justify-between items-center border-b border-gray-50"><span class="text-sm">接收新消息通知</span><div class="w-10 h-6 bg-green-500 rounded-full relative"><div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow"></div></div></div><div class="p-4 flex justify-between items-center border-b border-gray-50"><span class="text-sm">对非校友隐藏动态</span><div class="w-10 h-6 bg-gray-200 rounded-full relative"><div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow"></div></div></div><div class="p-4 text-center text-ctf-red text-sm font-bold border-t border-gray-100">退出登录</div></div>
+            </div>
+        </div>
+
+        <div x-show="showEventModal" style="display: none;" class="absolute inset-0 z-[60] bg-black/60 flex items-end backdrop-blur-sm"><div class="bg-white w-full rounded-t-[2.5rem] h-[92%] relative overflow-y-auto pb-10 shadow-2xl" @click.away="closeEvent()"><button @click="closeEvent()" class="absolute top-6 right-6 z-20 w-10 h-10 bg-black/20 text-white rounded-full flex items-center justify-center backdrop-blur-md hover:bg-black/40 transition active:scale-90"><i class="fas fa-times text-lg"></i></button><div class="h-80 relative"><img :src="currentEvent?.image" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div><div class="absolute bottom-4 left-6 right-6"><div class="flex space-x-2 mb-2"><span class="bg-red-50 text-ctf-red px-2 py-0.5 rounded text-[10px] font-bold border border-red-100">周大福专享</span></div><h2 class="text-2xl font-extrabold leading-tight text-gray-900" x-text="currentEvent?.title"></h2></div></div><div class="px-6 relative -mt-2"><div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-6"><div class="flex items-start mb-3"><i class="fas fa-map-marker-alt text-ctf-red text-lg mr-3 mt-0.5"></i><div class="flex-1"><div class="font-bold text-gray-800 text-sm" x-text="currentEvent?.location"></div></div></div><div class="flex items-start border-t border-gray-100 pt-3"><i class="fas fa-clock text-ctf-red text-lg mr-3 mt-0.5"></i><div class="flex-1"><div class="font-bold text-gray-800 text-sm" x-text="currentEvent?.date"></div></div></div><div class="flex items-start border-t border-gray-100 pt-3 mt-3"><i class="fas fa-ticket-alt text-ctf-red text-lg mr-3 mt-0.5"></i><div class="flex-1 flex justify-between items-center"><div><div class="font-bold text-gray-800 text-sm" x-text="currentEvent?.price || '免费'"></div></div><button class="px-3 py-1 bg-black text-white text-xs rounded-lg font-bold">购票</button></div></div></div><div class="mb-8"><h3 class="font-bold text-gray-900 mb-3 text-lg">活动介绍</h3><p class="text-gray-500 text-sm leading-7 text-justify" x-text="currentEvent?.summary"></p><div class="border-t border-gray-100 pt-6 mt-4"><h4 class="font-bold text-gray-900 text-base mb-3">活动详情</h4><div class="text-gray-500 text-sm leading-7 space-y-4 rich-text" x-html="currentEvent?.detailContent || '暂无更多详情'"></div></div></div><div class="absolute bottom-0 left-0 w-full p-5 bg-white border-t border-gray-100 flex space-x-3 pb-10 z-50"><button @click="toggleFavorite()" class="flex-1 border border-gray-200 text-gray-800 py-3.5 rounded-2xl font-bold text-sm shadow-sm hover:bg-gray-50 active:scale-95 transition-all flex flex-col items-center justify-center h-14"><i class="text-lg mb-0.5" :class="isFavorite ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-400'"></i></button><button class="flex-[4] bg-gray-900 text-white py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-gray-300 flex justify-center items-center hover:bg-ctf-red transition-colors active:scale-95 h-14" @click="joinEventGroup()">在此活动发起组局 <i class="fas fa-hand-sparkles ml-2 text-yellow-400"></i></button></div></div></div></div>
+
+        <div x-show="showCreateModal" style="display: none;" class="absolute inset-0 z-[60] flex items-end"><div x-show="showCreateModal" @click="showCreateModal = false" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div><div x-show="showCreateModal" class="relative w-full bg-white rounded-t-[2.5rem] h-[85vh] flex flex-col z-20 shadow-2xl" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"><div class="w-full h-8 flex items-center justify-center flex-shrink-0 cursor-pointer" @click="showCreateModal = false"><div class="w-10 h-1 bg-gray-300 rounded-full"></div></div><div class="px-6 flex justify-between items-center mb-2"><button x-show="createStep === 'form'" @click="createStep = 'menu'" class="text-gray-400 hover:text-gray-800 p-2 -ml-2"><i class="fas fa-chevron-left"></i></button><div x-show="createStep === 'menu'" class="w-8"></div><h2 class="text-xl font-bold text-gray-900" x-text="createStep === 'menu' ? '选择类型' : (createType === 'buddy' ? '发起找搭子' : '发布动态')"></h2><button class="text-gray-400 hover:text-gray-800 text-sm font-medium p-2" @click="createStep === 'form' ? createStep = 'menu' : showCreateModal = false"><span x-text="createStep === 'form' ? '取消' : '关闭'"></span></button></div><div class="flex-1 overflow-y-auto px-6 pb-40 no-scrollbar relative"><div x-show="createStep === 'menu'" class="grid grid-cols-1 gap-4 mt-6 animate-fade-in-up"><button @click="createStep = 'form'; createType = 'buddy'" class="bg-gradient-to-br from-red-50 to-white border border-red-100 p-6 rounded-3xl flex items-center shadow-sm hover:shadow-md transition-all group"><div class="w-14 h-14 bg-red-100 text-ctf-red rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform"><i class="fas fa-users"></i></div><div class="ml-4 text-left"><h3 class="font-bold text-lg text-gray-800">找搭子</h3><p class="text-xs text-gray-500 mt-1">组局看展、拼单下午茶</p></div><i class="fas fa-chevron-right ml-auto text-gray-300"></i></button><button @click="createStep = 'form'; createType = 'moment'" class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 p-6 rounded-3xl flex items-center shadow-sm hover:shadow-md transition-all group"><div class="w-14 h-14 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform"><i class="fas fa-camera"></i></div><div class="ml-4 text-left"><h3 class="font-bold text-lg text-gray-800">发动态</h3><p class="text-xs text-gray-500 mt-1">分享港漂生活瞬间</p></div><i class="fas fa-chevron-right ml-auto text-gray-300"></i></button></div><div x-show="createStep === 'form'" class="animate-slide-in-right"><div x-show="createType === 'buddy'" class="space-y-5"><div><label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">搭子主题 <span class="text-red-500">*</span></label><input x-model="createFormData.title" type="text" placeholder="例：这周六谁去陈奕迅演唱会？" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm focus:border-ctf-red focus:ring-1 focus:ring-ctf-red outline-none transition-colors"></div><div><label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">聚点 / 活动</label><div class="relative"><select class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm appearance-none outline-none text-gray-700 font-medium"><option>香港启德体育园 (Eason Chan 演唱会)</option><option>尖沙咀 K11 MUSEA</option><option>中环周大福体验店</option><option>香港大学</option></select><i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 pointer-events-none"></i></div></div><div class="flex space-x-4"><div class="flex-1"><label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">时间</label><input type="datetime-local" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none text-gray-600"></div><div class="w-1/3"><label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">缺人数</label><div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl p-3"><button class="text-gray-400 hover:text-ctf-red px-2" @click="createFormData.count > 1 ? createFormData.count-- : null"><i class="fas fa-minus"></i></button><input type="number" x-model="createFormData.count" class="w-full bg-transparent text-sm outline-none text-center font-bold"><button class="text-gray-400 hover:text-ctf-red px-2" @click="createFormData.count++"><i class="fas fa-plus"></i></button></div></div></div></div><div x-show="createType === 'moment'" class="space-y-5"><div><textarea rows="5" placeholder="分享你的港漂生活瞬间..." class="w-full bg-gray-50 border-0 rounded-xl p-4 text-base focus:ring-0 outline-none resize-none placeholder-gray-400"></textarea></div><div class="flex flex-wrap gap-2"><template x-for="(img, idx) in momentImages" :key="idx"><div class="w-24 h-24 rounded-xl overflow-hidden relative group"><img :src="img" class="w-full h-full object-cover"><button @click="momentImages.splice(idx, 1)" class="absolute top-1 right-1 bg-black/50 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"><i class="fas fa-times"></i></button></div></template><button @click="momentImages.push('https://images.unsplash.com/photo-1554907984-15263bfd63bd?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80')" class="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:border-ctf-red hover:text-ctf-red transition-colors bg-gray-50"><i class="fas fa-camera text-xl mb-1"></i><span class="text-[10px]">添加照片</span></button></div></div></div></div><div x-show="createStep === 'form'" class="absolute bottom-0 w-full bg-white border-t border-gray-100 p-6 pb-10 rounded-t-2xl shadow-[0_-5px_30px_rgba(0,0,0,0.05)]"><button @click="submitCreate()" class="w-full bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-ctf-red transition-all flex justify-center items-center active:scale-[0.98]" :class="{'opacity-75 cursor-wait': isSubmitting}"><span x-show="!isSubmitting"><span x-text="createType === 'buddy' ? '立即发起' : '发布动态'"></span><i class="fas fa-paper-plane ml-2"></i></span><span x-show="isSubmitting"><i class="fas fa-spinner fa-spin mr-2"></i>发布中...</span></button></div></div></div>
+        <div x-show="showChatModal" style="display: none;" class="absolute inset-0 z-[70] bg-gray-50 flex flex-col h-full rounded-[40px] overflow-hidden" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0" x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"><div class="h-24 bg-white shadow-sm flex items-end pb-3 px-4 relative z-20 border-b border-gray-100"><div class="w-full flex justify-between items-center"><button @click="showChatModal = false" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors"><i class="fas fa-arrow-left text-lg"></i></button><div class="flex flex-col items-center"><h2 class="font-bold text-base text-gray-900" x-text="currentChatUser?.name"></h2><div class="flex items-center text-[10px] text-green-500 font-medium"><span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>在线</div></div><button class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600"><i class="fas fa-ellipsis-v"></i></button></div></div><div class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#F2F4F7]" id="chatContainer"><div class="text-center"><span class="text-[10px] text-gray-400 bg-gray-200/50 px-2 py-0.5 rounded">今天 10:23</span></div><template x-for="(msg, index) in chatMessages" :key="index"><div class="flex w-full" :class="msg.isMe ? 'justify-end' : 'justify-start'"><div x-show="!msg.isMe" class="w-8 h-8 rounded-full bg-gray-300 mr-2 flex-shrink-0 overflow-hidden"><img :src="currentChatUser?.avatar" class="w-full h-full object-cover"></div><div class="max-w-[70%] px-4 py-2.5 shadow-sm text-sm leading-relaxed relative" :class="msg.isMe ? 'bg-ctf-red text-white chat-bubble-me rounded-2xl rounded-tr-none' : 'bg-white text-gray-800 chat-bubble-other rounded-2xl rounded-tl-none'"><span x-text="msg.text"></span><div x-show="msg.isTyping" class="flex space-x-1 items-center h-5"><div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div></div></div></div></template></div><div class="bg-white px-4 py-3 pb-8 border-t border-gray-100 flex items-end space-x-3 z-20"><button class="w-9 h-9 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center flex-shrink-0 hover:bg-gray-200"><i class="fas fa-plus"></i></button><div class="flex-1 bg-gray-100 rounded-2xl px-4 py-2 flex items-center"><input type="text" x-model="chatInput" @keydown.enter="sendMessage()" placeholder="发消息..." class="w-full bg-transparent text-sm outline-none text-gray-700"></div><button @click="sendMessage()" class="w-9 h-9 rounded-full bg-ctf-red text-white flex items-center justify-center flex-shrink-0 shadow-md transform active:scale-90 transition-transform" :class="chatInput.trim() ? 'opacity-100' : 'opacity-50'"><i class="fas fa-paper-plane text-xs"></i></button></div></div>
+        <div x-show="showPostModal" style="display: none;" class="absolute inset-0 z-[70] bg-black/60 flex items-end backdrop-blur-sm"><div class="bg-white w-full rounded-t-[2.5rem] h-[95%] relative flex flex-col shadow-2xl overflow-hidden" @click.away="showPostModal = false" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"><div class="flex items-center justify-between px-4 py-4 border-b border-gray-100 flex-shrink-0 bg-white z-10"><button @click="showPostModal = false" class="text-gray-500 p-2"><i class="fas fa-chevron-left text-lg"></i></button><div class="flex items-center space-x-2"><img :src="currentPost?.avatar" class="w-8 h-8 rounded-full border border-gray-100"><span class="font-bold text-sm" x-text="currentPost?.author"></span></div><button class="bg-ctf-red text-white text-xs px-3 py-1.5 rounded-full font-bold">关注</button></div><div class="flex-1 overflow-y-auto no-scrollbar bg-white"><img :src="currentPost?.image" class="w-full h-auto object-cover"><div class="p-5"><h1 class="text-xl font-bold text-gray-900 mb-3" x-text="currentPost?.title"></h1><p class="text-gray-600 text-sm leading-7 mb-4">这里是帖子的详细内容描述。今天打卡了非常棒的地方，推荐给大家！环境很好，服务也很棒，适合周末和朋友一起来放松。#香港生活 #探店 #周末去哪儿</p><div class="flex items-center text-xs text-gray-400 mb-6"><span class="mr-3">10-22</span><span x-text="currentPost?.location"></span></div></div></div><div class="h-16 border-t border-gray-100 flex items-center px-4 bg-white flex-shrink-0"><div class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-xs text-gray-400 mr-4">说点什么...</div><div class="flex space-x-5 text-gray-600 text-xl"><button class="hover:text-ctf-red transition-colors"><i class="far fa-heart"></i></button><button><i class="far fa-star"></i></button><button><i class="far fa-comment"></i></button></div></div></div></div>
+
+    </div>
+
+    <script>
+        function appData() {
+            return {
+                showSplash: true, // 新增：控制开屏页
+                activeTab: 'home',
+                activeBuddyFilter: '全部',
+                searchQuery: '',
+                selectedCategory: 1,
+                
+                showEventModal: false, showCreateModal: false, showChatModal: false, showPostModal: false, showEditProfileModal: false, showRedeemModal: false, showInternshipModal: false,
+                isSubmitting: false, isFavorite: false,
+                currentEvent: null, currentChatUser: null, currentPost: null, currentInternship: null,
+                chatInput: '', 
+                activeCommunityTab: 'recommend',
+                activeProfilePage: null, 
+                streakDays: 0,
+                userPoints: 8890,
+
+                // 个人信息 (默认未认证)
+                userProfile: {
+                    name: '小雨同学',
+                    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+                    gender: 'female',
+                    university: '香港大学',
+                    degree: '整合营销 (Master)',
+                    verified: false
+                },
+                tempProfile: {},
+                familyCards: [],
+
+                // 积分兑换列表
+                rewardsList: [
+                    { title: '周大福足金首饰95折', points: 1000, desc: '适用于所有香港门店，限购一件', discount: '95折', image: 'https://images.unsplash.com/photo-1599643478518-17488fbbcd75?ixlib=rb-1.2.1&auto=format&fit=crop&w=150&q=80' },
+                    { title: '启德体育园演唱会门票95折', points: 2000, desc: '适用于指定场次，最高减HKD 200', discount: '95折', image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=150&q=80' },
+                    { title: 'K11 MUSEA 购物现金券', points: 500, desc: '无门槛使用，限非餐饮商户', discount: '$50', image: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?ixlib=rb-1.2.1&auto=format&fit=crop&w=150&q=80' },
+                    { title: '周大福人寿保费抵扣券', points: 3000, desc: '适用于「荣耀世代」系列产品', discount: '$200', image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=150&q=80' },
+                    { title: 'Rosewood 下午茶85折', points: 1500, desc: '需提前预约，限平日使用', discount: '85折', image: 'https://images.unsplash.com/photo-1561049501-e1f96bdd98fd?ixlib=rb-1.2.1&auto=format&fit=crop&w=150&q=80' }
+                ],
+
+                // 实习/校招列表
+                internships: [
+                    { id: 1, title: '财富管理实习生 (暑期)', department: '周大福人寿 - 财富管理部', type: '暑期实习', location: '香港/深圳', icon: 'fas fa-chart-line', 
+                      desc: '<p>参与高净值客户资产配置方案的制定，协助资深顾问进行市场分析。</p>', 
+                      requirements: '<ul><li>金融、经济相关专业本科或硕士在读</li><li>流利的普通话及英语</li><li>对大湾区金融市场有浓厚兴趣</li></ul>',
+                      growth: '<ul><li>获得由CTF Life颁发的实习结业证书</li><li>表现优秀者可获得 Return Offer</li><li>高管导师 "一对一" 职业规划指导</li></ul>'
+                    },
+                    { id: 2, title: '精算分析助理', department: '周大福人寿 - 精算部', type: '日常实习', location: '香港总部', icon: 'fas fa-calculator', 
+                      desc: '<p>协助精算团队进行产品定价模型测试及风险评估数据整理。</p>', 
+                      requirements: '<ul><li>数学、统计或精算相关专业</li><li>熟悉Excel VBA及Python优先</li><li>每周至少实习3天</li></ul>',
+                      growth: '<ul><li>深入了解保险产品定价逻辑</li><li>参与精算师资格考试辅导</li><li>优秀者可推荐全职机会</li></ul>'
+                    },
+                    { id: 3, title: 'FinTech 产品管培生', department: '创新科技部', type: '全职/校招', location: '香港总部', icon: 'fas fa-mobile-alt', 
+                      desc: '<p>参与公司数字化转型项目，协助APP产品功能设计与用户体验优化。</p>', 
+                      requirements: '<ul><li>计算机或信息管理相关专业</li><li>具备良好的逻辑思维与沟通能力</li><li>有互联网产品实习经验者优先</li></ul>',
+                      growth: '<ul><li>全面轮岗机制（涵盖运营、产品、研发）</li><li>资深产品经理带教</li><li>具有竞争力的薪酬福利</li></ul>'
+                    }
+                ],
+
+                // 讲座列表 (Wealth Seminars)
+                lectures: [
+                    { id: 201, title: '大湾区金融就业前景深度解析', image: 'https://images.unsplash.com/photo-1544531586-fde5298cdd40?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80', tag: '职业规划', desc: '特邀周大福人寿HRD分享最新校招趋势与面试技巧。', benefit: '送面试直通卡', date: '11月10日', location: 'HKU 陆佑堂', summary: '特邀周大福人寿HRD分享最新校招趋势与面试技巧。', detailContent: '<h4>讲座亮点</h4><p>1. 2026年金融行业校招趋势解读<br>2. 如何在面试中脱颖而出？<br>3. 现场模拟群面环节。</p>', buddyCount: 156, buddies: ['https://i.pravatar.cc/150?img=11', 'https://i.pravatar.cc/150?img=33'] },
+                    { id: 202, title: 'ESG 投资：年轻人的财富新机遇', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80', tag: '投资理财', desc: '了解可持续发展投资理念，掌握未来财富密码。', benefit: '送星巴克券', date: '11月15日', location: '中环广场', summary: '了解可持续发展投资理念，掌握未来财富密码。', detailContent: '<h4>内容大纲</h4><p>什么是ESG？为什么它与你的钱包息息相关？专家带你构建绿色投资组合。</p>', buddyCount: 89, buddies: ['https://i.pravatar.cc/150?img=5', 'https://i.pravatar.cc/150?img=12'] },
+                    { id: 203, title: '从零开始：留学生资产配置实战', image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80', tag: '理财入门', desc: '告别月光族，教你如何利用学生身份薅羊毛理财。', benefit: '免费晚餐', date: '11月20日', location: 'PolyU 赛马会楼', summary: '告别月光族，教你如何利用学生身份薅羊毛理财。', detailContent: '<h4>课程福利</h4><p>讲座结束后提供免费自助晚餐，方便大家Networking，结识志同道合的搞钱搭子。</p>', buddyCount: 230, buddies: ['https://i.pravatar.cc/150?img=42', 'https://i.pravatar.cc/150?img=60'] }
+                ],
+
+                createStep: 'menu', createType: 'buddy', createFormData: { title: '', count: 2 }, momentImages: [],
+
+                toasts: [], chatMessages: [],
+
+                categories: [
+                    { id: 1, name: '推荐', icon: 'fas fa-fire' },
+                    { id: 2, name: '演唱会', icon: 'fas fa-microphone-alt' },
+                    { id: 3, name: '艺术展', icon: 'fas fa-palette' },
+                    { id: 4, name: '手作坊', icon: 'fas fa-ring' },
+                    { id: 6, name: '文化', icon: 'fas fa-torii-gate' },
+                    { id: 5, name: '讲座', icon: 'fas fa-book-open' }, 
+                ],
+                
+                buddyFilters: ['全部', '只看女生', '同校', '同年级', '最近活跃'],
+                
+                topics: [
+                    { name: '#演唱会搭子', bg: 'bg-gradient-to-r from-purple-500 to-pink-500' },
+                    { name: '#K11探店', bg: 'bg-gradient-to-r from-orange-400 to-red-500' },
+                    { name: '#港漂日常', bg: 'bg-gradient-to-r from-blue-400 to-cyan-500' }
+                ],
+
+                // ====== 核心数据：活动 (周大福生态 + 香港特色) ======
+                events: [
+                    { 
+                        id: 1, catId: 2, 
+                        title: 'Eason Chan FEAR AND DREAMS @启德体育园', 
+                        locationShort: '启德体育园', location: '香港启德体育园 (CTF Partner)', 
+                        date: '10月20日 19:30', 
+                        image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', 
+                        summary: '周大福独家赞助！专为在港内地生预留200张门票。不想一个人看演唱会？快来这里找个一起尖叫的搭子吧！',
+                        detailContent: `
+                            <h4>活动简介</h4>
+                            <p>Eason Chan FEAR AND DREAMS 世界巡回演唱会香港站，将于启德体育园盛大举行。作为周大福独家合作伙伴，我们为Icare用户争取到了内部预留票源。</p>
+                            <h4>Icare 专属权益</h4>
+                            <ul>
+                                <li>免去公售抢票烦恼，直接锁票。</li>
+                                <li>现场领取周大福定制应援荧光棒。</li>
+                                <li>可参与后台探班抽奖。</li>
+                            </ul>
+                            <h4>注意事项</h4>
+                            <p>请携带学生证核销入场。严禁转售。</p>
+                        `,
+                        status: '余票紧张', price: 'HKD 980起', benefit: '会员优先购', buddies: ['https://i.pravatar.cc/150?img=1', 'https://i.pravatar.cc/150?img=5'], buddyCount: 128 
+                    },
+                    { 
+                        id: 101, catId: 6, 
+                        title: '鹅颈桥打小人 - 考前水逆退散！', 
+                        locationShort: '鹅颈桥', location: '铜锣湾鹅颈桥底', 
+                        date: '每日 10:00-18:00', 
+                        image: 'https://images.unsplash.com/photo-1623695272677-4c471444464f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', 
+                        summary: '惊蛰未到也能打！体验香港非遗文化，把Final周的压力全部打走！活动包含婆婆现场教学与解压互动。',
+                        detailContent: `
+                            <h4>非遗体验</h4>
+                            <p>打小人是香港著名的民间巫术仪轨，被列为非物质文化遗产。在鹅颈桥底，专业的“神婆”将为你驱除霉运。</p>
+                            <h4>适合人群</h4>
+                            <p>Final周压力大的学生、近期感觉水逆的同学、对香港民俗感兴趣的文化探索者。</p>
+                        `,
+                        status: '减压推荐', price: 'HKD 50/次', benefit: '文化体验', buddies: ['https://i.pravatar.cc/150?img=3', 'https://i.pravatar.cc/150?img=4'], buddyCount: 32 
+                    },
+                    { 
+                        id: 102, catId: 6, 
+                        title: '长洲太平清醮 - 抢包山体验营', 
+                        locationShort: '长洲岛', location: '长洲岛北帝庙游乐场', 
+                        date: '5月15日 全天', 
+                        image: 'https://images.unsplash.com/photo-1599920448786-9037c8ee8798?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', 
+                        summary: '深入离岛，体验最地道的“平安包”制作与攀爬训练，祈求平安健康。更有机会亲眼目睹抢包山比赛盛况！',
+                        detailContent: `
+                            <h4>活动亮点</h4>
+                            <p>不仅能观看一年一度的抢包山大赛，还能在专业教练指导下，体验攀爬包山的乐趣。午餐包含长洲特色的海鲜大餐。</p>
+                            <h4>行程安排</h4>
+                            <ul>
+                                <li>09:00 中环码头集合</li>
+                                <li>10:30 平安包制作工坊</li>
+                                <li>14:00 攀爬体验与比赛观摩</li>
+                            </ul>
+                        `,
+                        status: '季节限定', price: 'HKD 80', benefit: '送平安包', buddies: ['https://i.pravatar.cc/150?img=6', 'https://i.pravatar.cc/150?img=7'], buddyCount: 55 
+                    },
+                    { 
+                        id: 2, catId: 3, 
+                        title: 'K11 MUSEA 莫奈沉浸式光影展', 
+                        locationShort: 'K11 MUSEA', location: '尖沙咀 K11 MUSEA', 
+                        date: '本周末全天', 
+                        image: 'https://images.unsplash.com/photo-1570701564993-e00652af8aa7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', 
+                        summary: '感受艺术与商业的完美融合。持学生证可享门票半价，周大福会员赠送限定周边。适合拍照打卡，寻找互拍搭子！',
+                        detailContent: `
+                            <h4>展览介绍</h4>
+                            <p>本次展览通过360度光影技术，重现印象派大师莫奈的经典画作。置身于睡莲池畔，感受光影的流动。</p>
+                            <h4>特别福利</h4>
+                            <p>Icare用户凭学生证购票，可享买一送一优惠。现场打卡发布社区动态，赠送精美明信片。</p>
+                        `,
+                        status: '火热进行中', price: 'HKD 120', benefit: '送周边', buddies: ['https://i.pravatar.cc/150?img=9'], buddyCount: 45 
+                    },
+                    { id: 3, catId: 4, title: 'CTF 珠宝鉴赏工作坊 & 手作体验', locationShort: 'CTF 中环', location: '中环周大福体验店', date: '周日 14:00', image: 'https://images.unsplash.com/photo-1617038224531-ab5d78665b38?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', desc: '亲手制作属于你的第一件金饰，体验传统工艺。', summary: '亲手制作属于你的第一件金饰，体验传统工艺。活动结束后提供Rosewood酒店特供下午茶，适合女生社交。', detailContent: '<h4>活动内容</h4><p>在周大福资深工匠的指导下，学习金饰制作的基本工艺。你将亲手打磨、抛光，制作一枚专属的纯银戒指（可镀金）。</p>', status: '需预约', price: '免费', benefit: '独家权益', buddies: ['https://i.pravatar.cc/150?img=20'], buddyCount: 12 },
+                    { id: 4, catId: 5, title: '周大福人寿：留学生的第一桶金', locationShort: '湾仔会展', location: '香港会议展览中心', date: '11月5日 19:00', image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', desc: '金融大咖教你如何在大湾区进行资产配置，规划美好未来。', summary: '金融大咖教你如何在大湾区进行资产配置，规划美好未来。', detailContent: '<h4>讲座大纲</h4><p>1. 留学生如何进行资产配置？<br>2. 大湾区金融就业前景分析。<br>3. 荣耀世代储蓄计划深度解析。</p>', status: '报名中', price: '免费', benefit: '送保险券', buddies: ['https://i.pravatar.cc/150?img=33'], buddyCount: 200 },
+                    { id: 5, catId: 1, title: 'Rosewood DarkSide 爵士之夜', locationShort: '瑰丽酒店', location: 'Rosewood DarkSide Bar', date: '本周五 20:00', image: 'https://images.unsplash.com/photo-1514362545857-3bc16549766b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', desc: '在亚洲最佳酒吧享受爵士乐。出示学生会员卡，首杯特调免费。', summary: '在亚洲最佳酒吧享受爵士乐。出示学生会员卡，首杯特调免费。', detailContent: '<h4>酒吧介绍</h4><p>DarkSide 荣获亚洲50佳酒吧，以陈年烈酒和经典鸡尾酒闻名。现场有顶级爵士乐队驻场演奏。</p>', status: '免预约', price: '丰俭由人', benefit: '首杯免费', buddies: ['https://i.pravatar.cc/150?img=42'], buddyCount: 56 },
+                    { id: 6, catId: 5, title: '周大福秋季管培生宣讲会 (HKU站)', locationShort: '香港大学', location: 'HKU 陆佑堂', date: '11月1日 10:00', image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', desc: 'HR总监亲临，现场接收简历。', summary: 'HR总监亲临，现场接收简历。提供简历修改建议。', detailContent: '<h4>招聘岗位</h4><p>市场营销、珠宝设计、金融分析、IT技术支持。</p>', status: '重要', price: '免费', benefit: '面试直通', buddies: [], buddyCount: 300 },
+                    { id: 103, catId: 6, title: '港式霓虹灯牌制作 Workshop', locationShort: '油麻地', location: '油麻地老街坊', date: '周末全天', image: 'https://images.unsplash.com/photo-1569701813229-33284b64363c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', desc: '亲手制作专属的港风霓虹灯牌。', summary: '亲手制作专属的港风霓虹灯牌，重现《重庆森林》经典画面。', detailContent: '<h4>工坊内容</h4><p>了解香港霓虹灯历史，学习弯曲灯管技巧，制作一个属于你自己的发光文字或图案。</p>', status: '小班教学', price: 'HKD 200', benefit: '学生8折', buddies: [], buddyCount: 15 },
+                    { id: 7, catId: 1, title: '龙脊户外徒步 - 周末减压局', locationShort: '石澳龙脊', location: '筲箕湾地铁站集合', date: '周六 09:00', image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', desc: '亚洲最美徒步路线，俯瞰石澳海滩。', summary: '亚洲最美徒步路线，俯瞰石澳海滩。', detailContent: '<h4>路线简介</h4><p>全程约8.5公里，耗时约3小时。难度适中，风景绝美。</p>', status: 'AA制', price: '免费', benefit: '', buddies: [], buddyCount: 16 },
+                    { id: 8, catId: 3, title: 'M+ 博物馆草间弥生特展', locationShort: 'M+ Museum', location: '西九文化区 M+', date: '本月全天', image: 'https://images.unsplash.com/photo-1565060169372-b5299446c646?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', desc: '圆点女王的视觉盛宴，拍照超级出片。', summary: '圆点女王的视觉盛宴，拍照超级出片。', detailContent: '<h4>展览亮点</h4><p>展出草间弥生超过200件作品，包括绘画、雕塑、装置艺术等。</p>', status: '热展中', price: 'HKD 140', benefit: '', buddies: [], buddyCount: 67 }
+                ],
+
+                // 专门用于财务页面的活动
+                financeEvents: [
+                    { id: 4, catId: 5, title: '周大福人寿：第一桶金规划与聚餐', locationShort: '湾仔会展', location: '香港会议展览中心', date: '11月5日 19:00', image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', desc: '金融大咖教你如何在大湾区进行资产配置，规划美好未来。', status: '报名中', price: '免费', benefit: '送保险券', buddies: ['https://i.pravatar.cc/150?img=33'], buddyCount: 200 }
+                ],
+
+                // ====== 核心数据：用户 (搭子) ======
+                users: [
+                    { id: 1, name: 'Chris_HKU', gender: 'male', school: 'HKU', grade: 'Master', avatar: 'https://i.pravatar.cc/150?img=11', verified: true, interest: '陈奕迅演唱会', tags: ['ENFP', '摄影'], lastActive: 1, matchScore: 98 },
+                    { id: 2, name: 'Momo在城大', gender: 'female', school: 'CityU', grade: 'Year 3', avatar: 'https://i.pravatar.cc/150?img=5', verified: true, interest: 'K11 艺术展', tags: ['INFJ', '探店'], lastActive: 120, matchScore: 65 },
+                    { id: 3, name: 'Jason_PolyU', gender: 'male', school: 'PolyU', grade: 'Master', avatar: 'https://i.pravatar.cc/150?img=33', verified: false, interest: '启德体育园', tags: ['运动', '篮球'], lastActive: 5, matchScore: 70 },
+                    { id: 4, name: 'Jessica_CUHK', gender: 'female', school: 'CUHK', grade: 'Year 4', avatar: 'https://i.pravatar.cc/150?img=9', verified: true, interest: '金饰手作', tags: ['文艺', '手工'], lastActive: 10, matchScore: 60 },
+                    { id: 5, name: 'David_HKUST', gender: 'male', school: 'HKUST', grade: 'PhD', avatar: 'https://i.pravatar.cc/150?img=3', verified: true, interest: '金融讲座', tags: ['科技', '理财'], lastActive: 300, matchScore: 50 },
+                    { id: 6, name: 'Anna_HKU', gender: 'female', school: 'HKU', grade: 'Master', avatar: 'https://i.pravatar.cc/150?img=24', verified: true, interest: 'Rosewood', tags: ['ESFP', '喝酒'], lastActive: 2, matchScore: 95 },
+                    { id: 7, name: 'Eric_PolyU', gender: 'male', school: 'PolyU', grade: 'Year 2', avatar: 'https://i.pravatar.cc/150?img=53', verified: false, interest: '陈奕迅演唱会', tags: ['听歌', '夜跑'], lastActive: 45, matchScore: 40 },
+                    { id: 8, name: 'Sophia', gender: 'female', school: 'HKBU', grade: 'Year 1', avatar: 'https://i.pravatar.cc/150?img=42', verified: true, interest: '下午茶', tags: ['吃货', '拍照'], lastActive: 15, matchScore: 55 },
+                    { id: 9, name: 'Tom_Lingnan', gender: 'male', school: 'Lingnan', grade: 'Year 3', avatar: 'https://i.pravatar.cc/150?img=60', verified: true, interest: '西九龙草地', tags: ['吉他', '民谣'], lastActive: 20, matchScore: 45 },
+                    { id: 10, name: 'Alice_EduHK', gender: 'female', school: 'EduHK', grade: 'Master', avatar: 'https://i.pravatar.cc/150?img=44', verified: false, interest: 'M+博物馆', tags: ['画画', '看展'], lastActive: 55, matchScore: 30 }
+                ],
+                
+                // ====== 核心数据：社区帖子 ======
+                communityPosts: [
+                    { id: 1, title: 'K11 Musea 这个展太好拍了！', image: 'https://images.unsplash.com/photo-1554907984-15263bfd63bd', author: 'Mina', avatar: 'https://i.pravatar.cc/150?img=5', likes: 42, liked: true, location: 'K11', heightClass: 'h-48', isSameSchool: false },
+                    { id: 2, title: '终于抢到Eason的票了！', image: 'https://images.unsplash.com/photo-1459749411177-0473ef71607b', author: 'RockBoy', avatar: 'https://i.pravatar.cc/150?img=11', likes: 128, liked: false, location: '启德', heightClass: 'h-32', isSameSchool: true },
+                    { id: 3, title: '港大食堂真的吃腻了，求推荐', image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5', author: 'Foodie', avatar: 'https://i.pravatar.cc/150?img=33', likes: 12, liked: false, location: 'HKU', heightClass: 'h-40', isSameSchool: true },
+                    { id: 4, title: '周大福金工坊初体验✨', image: 'https://images.unsplash.com/photo-1601121141461-9d6647bca1ed', author: '小透明', avatar: 'https://i.pravatar.cc/150?img=9', likes: 56, liked: true, location: '中环', heightClass: 'h-40', isSameSchool: false },
+                    { id: 5, title: '智华馆通宵赶Due，有没有一起的？', image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6', author: 'Scholar', avatar: 'https://i.pravatar.cc/150?img=15', likes: 5, liked: false, location: 'HKU Library', heightClass: 'h-32', isSameSchool: true },
+                    { id: 6, title: '西九龙看日落，太治愈了', image: 'https://images.unsplash.com/photo-1533174072545-e8d4aa97edf9', author: 'Sunny', avatar: 'https://i.pravatar.cc/150?img=22', likes: 200, liked: true, location: '西九', heightClass: 'h-52', isSameSchool: false },
+                    { id: 7, title: '这周的Marketing课有人组队吗？', image: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952', author: 'Mike', avatar: 'https://i.pravatar.cc/150?img=60', likes: 2, liked: false, location: 'HKU', heightClass: 'h-36', isSameSchool: true },
+                    { id: 8, title: '铜锣湾Sogo周年庆扫货攻略', image: 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df', author: 'Shopaholic', avatar: 'https://i.pravatar.cc/150?img=44', likes: 88, liked: false, location: 'CWB', heightClass: 'h-44', isSameSchool: false },
+                    { id: 9, title: '坚尼地城海边的咖啡店', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93', author: 'CafeLover', avatar: 'https://i.pravatar.cc/150?img=30', likes: 45, liked: true, location: 'Kennedy Town', heightClass: 'h-48', isSameSchool: false },
+                    { id: 10, title: '避雷！这家茶餐厅态度巨差', image: 'https://images.unsplash.com/photo-1550966871-3ed3c47e2ce2', author: 'AngryBird', avatar: 'https://i.pravatar.cc/150?img=12', likes: 300, liked: false, location: 'Wan Chai', heightClass: 'h-32', isSameSchool: true }
+                ],
+
+                // 筛选逻辑 Getter (Updated)
+                get filteredEvents() {
+                    return this.events.filter(e => {
+                        const matchSearch = e.title.toLowerCase().includes(this.searchQuery.toLowerCase()) || e.location.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        const matchCat = this.selectedCategory === 1 ? true : e.catId === this.selectedCategory;
+                        return matchSearch && matchCat;
+                    });
+                },
+                get filteredUsers() {
+                    return this.users.filter(u => {
+                        if (this.activeBuddyFilter === '全部') return true;
+                        if (this.activeBuddyFilter === '只看女生') return u.gender === 'female';
+                        if (this.activeBuddyFilter === '同校') return u.school === 'HKU';
+                        if (this.activeBuddyFilter === '同年级') return u.grade === 'Master';
+                        if (this.activeBuddyFilter === '最近活跃') return u.lastActive <= 60;
+                        return true;
+                    }).sort((a, b) => b.matchScore - a.matchScore); // 按匹配度排序
+                },
+                get filteredCommunityPosts() {
+                    if (this.activeCommunityTab === 'school') return this.communityPosts.filter(p => p.isSameSchool);
+                    return this.communityPosts;
+                },
+
+                // 通用方法
+                formatActiveTime(minutes) {
+                    if (minutes <= 1) return '刚刚活跃';
+                    if (minutes < 60) return `${minutes}分钟前`;
+                    return '今天';
+                },
+                addToast(msg, type = 'success') {
+                    const id = Date.now();
+                    const icon = type === 'success' ? 'fa-check-circle text-green-400' : type === 'loading' ? 'fa-spinner fa-spin text-blue-400' : 'fa-info-circle text-blue-400';
+                    this.toasts.push({ id, message: msg, icon });
+                    setTimeout(() => { this.toasts = this.toasts.filter(t => t.id !== id); }, 3000);
+                },
+                
+                // 开屏
+                enterApp() {
+                    this.showSplash = false;
+                },
+
+                // 编辑个人资料
+                openEditProfile() {
+                    this.tempProfile = { ...this.userProfile }; // 浅拷贝
+                    this.showEditProfileModal = true;
+                },
+                saveProfile() {
+                    this.userProfile = { ...this.tempProfile };
+                    this.showEditProfileModal = false;
+                    this.addToast('个人资料已更新');
+                },
+                
+                // 兑换
+                redeemItem(item) {
+                    this.addToast(`兑换成功！消耗 ${item.points} 积分`, 'success');
+                    this.showRedeemModal = false;
+                },
+                
+                // 验证
+                verifyUser() {
+                    this.addToast('正在提交认证审核...', 'loading');
+                    setTimeout(() => {
+                        this.userProfile.verified = true;
+                        this.addToast('认证成功！会员权益已解锁', 'success');
+                    }, 2000);
+                },
+                
+                // 添加家属
+                addFamilyMember() {
+                    this.familyCards.push({ name: '家属 ' + (this.familyCards.length + 1), relation: '父母' });
+                    this.addToast('副卡添加成功', 'success');
+                },
+
+                // 奶茶打卡
+                deposit() {
+                    this.streakDays++;
+                    let points = 10;
+                    if (this.streakDays >= 3) points = 20; // 连签奖励
+                    this.userPoints += points;
+                    this.addToast(`成功存入！积分 +${points} (连签 ${this.streakDays} 天)`, 'success');
+                },
+                
+                // 步数同步
+                syncSteps() {
+                    this.addToast('同步成功！积分 +20', 'success');
+                    this.userPoints += 20;
+                },
+
+                // 打开实习详情
+                openInternship(job) {
+                    this.currentInternship = job;
+                    this.showInternshipModal = true;
+                },
+
+                // 页面逻辑
+                openProfilePage(page) { this.activeProfilePage = page; },
+                getProfilePageTitle() { const titles = { 'wallet': '我的钱包', 'membership': '会员中心', 'tickets': '我的票务', 'wishlist': '心愿单', 'verify': '学生认证', 'settings': '设置' }; return titles[this.activeProfilePage] || '详情'; },
+                selectCategory(id) { this.selectedCategory = id; },
+                openEvent(event) { this.currentEvent = event; this.isFavorite = false; this.showEventModal = true; },
+                closeEvent() { this.showEventModal = false; },
+                toggleFavorite() { this.isFavorite = !this.isFavorite; this.addToast(this.isFavorite ? '已收藏' : '取消收藏'); },
+                joinEventGroup() { this.showEventModal = false; this.showCreateModal = true; this.createStep = 'form'; this.createType = 'buddy'; this.createFormData.title = `约伴：去 ${this.currentEvent.title}`; },
+                triggerQuickJoin(event) { this.addToast(`已发送请求`, 'success'); },
+                toggleLike(post) { post.liked = !post.liked; post.likes += post.liked ? 1 : -1; if(post.liked) this.addToast('点赞成功 ❤️'); },
+                openPost(post) { this.currentPost = post; this.showPostModal = true; },
+                openCreateModal() { this.createStep = 'menu'; this.createFormData.title = ''; this.showCreateModal = true; },
+                submitCreate() { if (this.createType === 'buddy' && !this.createFormData.title.trim()) { this.addToast('请填写搭子主题', 'info'); return; } this.isSubmitting = true; setTimeout(() => { this.isSubmitting = false; this.showCreateModal = false; this.addToast('发布成功', 'success'); this.activeTab = this.createType === 'buddy' ? 'buddy' : 'moments'; }, 1500); },
+                openChat(user) { this.currentChatUser = user; this.showChatModal = true; this.chatMessages = [{ text: `哈喽，你也想去${user.interest}吗？`, isMe: false, time: '10:23' }]; this.$nextTick(() => { document.getElementById('chatContainer').scrollTop = 9999; }); },
+                sendMessage() { if (!this.chatInput.trim()) return; const text = this.chatInput; const now = new Date(); const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`; this.chatMessages.push({ text: text, isMe: true, time: timeStr }); this.chatInput = ''; this.$nextTick(() => { document.getElementById('chatContainer').scrollTop = 9999; }); setTimeout(() => { this.chatMessages.push({ isTyping: true, isMe: false }); this.$nextTick(() => { document.getElementById('chatContainer').scrollTop = 9999; }); setTimeout(() => { this.chatMessages.pop(); this.chatMessages.push({ text: "好呀，具体什么时候？", isMe: false, time: timeStr }); this.$nextTick(() => { document.getElementById('chatContainer').scrollTop = 9999; }); }, 1500); }, 600); }
+            }
+        }
+    </script>
+</body>
+</html>

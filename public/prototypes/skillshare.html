@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <title>SkillShare - Pitch Perfect Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', '-apple-system', 'sans-serif'] },
+                    colors: {
+                        primary: '#000000',
+                        secondary: '#4F46E5',
+                        accent: '#F43F5E',
+                        success: '#00C853',
+                        surface: '#FBFBFD',
+                        dark: '#1d1d1f',
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -15px rgba(0,0,0,0.03)',
+                        'float': '0 12px 36px -12px rgba(0,0,0,0.15)',
+                        'metal': 'inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 40px rgba(0,0,0,0.4)',
+                    },
+                    animation: {
+                        'slide-up-spring': 'slideUpSpring 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-down': 'slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'pop-spring': 'popSpring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    },
+                    keyframes: {
+                        slideUpSpring: {
+                            '0%': { transform: 'translateY(100%)', opacity: '0.5' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(0)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        popSpring: {
+                            '0%': { transform: 'scale(0.92)' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '100%': { transform: 'scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+
+        let currentTab = 'home';
+        let activeSheets = new Set(); 
+
+        function initScrollListener() {
+            const mainContent = document.getElementById('main-scroll-area');
+            const topNav = document.getElementById('top-nav');
+            
+            mainContent.addEventListener('scroll', () => {
+                if (mainContent.scrollTop > 20) {
+                    topNav.classList.add('bg-white/70', 'backdrop-blur-xl', 'border-b', 'border-gray-200/50');
+                    topNav.classList.remove('bg-transparent', 'border-transparent');
+                } else {
+                    topNav.classList.remove('bg-white/70', 'backdrop-blur-xl', 'border-b', 'border-gray-200/50');
+                    topNav.classList.add('bg-transparent', 'border-transparent');
+                }
+            });
+
+            document.getElementById('chat-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+
+        function switchTab(tabId) {
+            activeSheets.forEach(sheetId => closeSubView(sheetId, true));
+
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('animate-fade-in');
+            });
+            const target = document.getElementById(tabId);
+            if (target) {
+                target.classList.remove('hidden');
+                void target.offsetWidth; 
+                target.classList.add('animate-fade-in');
+                document.getElementById('main-scroll-area').scrollTo({top: 0, behavior: 'smooth'});
+            }
+
+            document.querySelectorAll('.mobile-nav-item').forEach(btn => {
+                const isActive = btn.dataset.target === tabId;
+                const icon = btn.querySelector('i');
+                const text = btn.querySelector('span');
+                
+                if (isActive) {
+                    btn.classList.add('text-primary');
+                    btn.classList.remove('text-gray-400');
+                    icon.classList.add('scale-110', '-translate-y-1');
+                    text.classList.add('font-bold', 'opacity-100');
+                    text.classList.remove('opacity-0');
+                } else {
+                    btn.classList.remove('text-primary');
+                    btn.classList.add('text-gray-400');
+                    icon.classList.remove('scale-110', '-translate-y-1');
+                    text.classList.remove('font-bold', 'opacity-100');
+                    text.classList.add('opacity-0');
+                }
+            });
+        }
+
+        function openSubView(viewId, data = null) {
+            const view = document.getElementById(viewId);
+            if(view) {
+                if (viewId === 'view-skill-detail' && data) initSkillDetail(data);
+                if (viewId === 'view-chat' && data) {
+                    document.getElementById('chat-title').innerText = data.user;
+                }
+                
+                view.classList.remove('hidden');
+                activeSheets.add(viewId);
+                const content = view.querySelector('.sheet-content');
+                if(content) {
+                    content.classList.remove('animate-slide-down');
+                    content.classList.add('animate-slide-up-spring');
+                }
+                document.getElementById('app-layout').style.transform = 'scale(0.95)';
+                document.getElementById('app-layout').style.borderRadius = '24px';
+                document.getElementById('app-layout').style.overflow = 'hidden';
+            }
+        }
+
+        function closeSubView(viewId, immediate = false) {
+            const view = document.getElementById(viewId);
+            if(view) {
+                const content = view.querySelector('.sheet-content');
+                if(content && !immediate) {
+                    content.classList.remove('animate-slide-up-spring');
+                    content.classList.add('animate-slide-down');
+                    setTimeout(() => { view.classList.add('hidden'); }, 350);
+                } else {
+                    view.classList.add('hidden');
+                }
+                activeSheets.delete(viewId);
+                
+                if(activeSheets.size === 0) {
+                    document.getElementById('app-layout').style.transform = 'scale(1)';
+                    document.getElementById('app-layout').style.borderRadius = '0';
+                }
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-16 left-1/2 transform -translate-x-1/2 bg-black/85 backdrop-blur-xl border border-white/10 text-white px-6 py-3.5 rounded-full shadow-float z-[100] text-sm font-semibold animate-slide-up-spring flex items-center justify-center whitespace-nowrap`;
+            const icon = type === 'success' ? 'fa-check-circle text-green-400' : 'fa-exclamation-circle text-red-400';
+            toast.innerHTML = `<i class="fas ${icon} text-lg mr-2"></i> ${message}`;
+            document.getElementById('iphone-screen').appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, -20px) scale(0.9)';
+                toast.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        function enterApp() {
+            const welcome = document.getElementById('welcome');
+            welcome.style.opacity = '0';
+            welcome.style.transform = 'scale(1.05)';
+            welcome.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+            setTimeout(() => {
+                welcome.classList.add('hidden');
+                document.getElementById('app-layout').classList.remove('hidden');
+                switchTab('home');
+                initScrollListener();
+            }, 600);
+        }
+
+        function initSkillDetail(data) {
+            document.getElementById('detail-img').src = data.img;
+            document.getElementById('detail-title').innerText = data.title;
+            document.getElementById('detail-user').innerText = data.user;
+            document.getElementById('detail-price').innerText = data.price;
+            document.getElementById('detail-tag').innerText = data.tag || '默认技能';
+        }
+
+        function handleMatchAction(action, cardId, event) {
+            event.stopPropagation();
+            const card = document.getElementById(cardId);
+            card.style.transform = 'scale(0.9)';
+            card.style.opacity = '0';
+            card.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+            
+            setTimeout(() => {
+                if(action === 'accept') {
+                    showToast('已接单！资金已进入平台托管账户');
+                    const orderId = 'ORD' + Math.floor(Math.random() * 100000);
+                    const newOrderHtml = `
+                        <div class="bg-white rounded-3xl shadow-soft border border-gray-100 p-5 mb-4 animate-slide-up-spring cursor-pointer" onclick="showToast('订单进行中，无法操作')">
+                            <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-50">
+                                <div class="flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-yellow-400 mr-2 animate-pulse"></span>
+                                    <span class="text-xs font-bold text-gray-700">服务进行中</span>
+                                </div>
+                                <span class="text-[10px] text-gray-400 font-mono">ID: ${orderId}</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-5">
+                                <span class="font-extrabold text-sm text-gray-900">AI工具实战</span>
+                                <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 mx-2"><i class="fas fa-exchange-alt text-xs"></i></div>
+                                <span class="font-extrabold text-sm text-gray-900">UI设计</span>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-xl flex justify-between items-center text-sm border border-gray-100">
+                                <span class="text-gray-500 font-medium text-xs">补差价 (托管中)</span>
+                                <span class="text-success font-bold">+ ¥120.00</span>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('in-progress-list').insertAdjacentHTML('afterbegin', newOrderHtml);
+                } else {
+                    showToast('已婉拒该请求', 'error');
+                }
+                card.remove();
+                if(document.querySelectorAll('#requests-list > div').length === 0) {
+                    document.getElementById('empty-request-state').classList.remove('hidden');
+                }
+            }, 300);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            const container = document.getElementById('chat-container');
+            const userMsgHtml = `
+                <div class="flex justify-end mb-4 animate-pop-spring">
+                    <div class="bg-black text-white px-4 py-3 rounded-2xl rounded-tr-sm shadow-sm max-w-[80%]">
+                        <p class="text-sm font-medium leading-relaxed">${msg}</p>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', userMsgHtml);
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                const replyHtml = `
+                <div class="flex justify-start mb-4 animate-pop-spring">
+                    <div class="bg-white text-gray-800 px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 max-w-[80%]">
+                        <p class="text-sm font-medium leading-relaxed">好的，没问题！我们可以这周末线上沟通一下具体细节。</p>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', replyHtml);
+                container.scrollTop = container.scrollHeight;
+            }, 800);
+        }
+
+        function toggleFilter(btn) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('button').forEach(b => {
+                b.className = "bg-white border border-gray-200 text-gray-500 text-xs px-5 py-2.5 rounded-full transition-all active:scale-95 font-medium shrink-0";
+            });
+            btn.className = "bg-primary text-white text-xs px-5 py-2.5 rounded-full shadow-md transition-all active:scale-95 font-bold shrink-0";
+            
+            const grid = document.getElementById('explore-grid');
+            grid.style.opacity = '0';
+            setTimeout(() => {
+                grid.style.opacity = '1';
+                showToast('已更新该分类下技能');
+            }, 300);
+        }
+
+        function updateFeeCalculation() {
+            const amount = parseFloat(document.getElementById('gapAmount').value) || 0;
+            document.getElementById('platformFee').innerText = `¥ ${(amount * 0.1).toFixed(2)}`;
+            document.getElementById('actualTotal').innerText = `¥ ${(amount * 0.9).toFixed(2)}`;
+        }
+
+        function selectTag(elem) {
+            elem.classList.toggle('bg-black');
+            elem.classList.toggle('text-white');
+            elem.classList.toggle('bg-gray-100');
+            elem.classList.toggle('text-gray-600');
+            elem.classList.toggle('border-transparent');
+            elem.classList.toggle('border-gray-200');
+        }
+    </script>
+    <style>
+        :root {
+            --iphone-screen-w: 393px;
+            --iphone-screen-h: 852px;
+            --iphone-frame: 12px;
+            --iphone-scale: 1;
+        }
+
+        html, body { width: 100%; height: 100%; }
+        body {
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 18%, rgba(255,255,255,.95), rgba(238,240,244,.9) 36%, rgba(214,218,224,.95) 100%);
+        }
+
+        /* Desktop prototype stage: always show the app inside an iPhone-sized device. */
+        #iphone-stage {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 18px;
+        }
+
+        #iphone-device {
+            position: relative;
+            width: calc(var(--iphone-screen-w) + (var(--iphone-frame) * 2));
+            height: calc(var(--iphone-screen-h) + (var(--iphone-frame) * 2));
+            padding: var(--iphone-frame);
+            border-radius: 62px;
+            background: linear-gradient(145deg, #4a4a4d 0%, #111113 18%, #050506 55%, #2b2b2e 100%);
+            box-shadow:
+                0 34px 70px rgba(0,0,0,.28),
+                0 10px 24px rgba(0,0,0,.18),
+                inset 0 0 0 1px rgba(255,255,255,.17),
+                inset 0 0 0 2px rgba(0,0,0,.8);
+            transform: scale(var(--iphone-scale));
+            transform-origin: center center;
+            flex: 0 0 auto;
+        }
+
+        #iphone-device::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 59px;
+            border: 1px solid rgba(255,255,255,.08);
+            pointer-events: none;
+            z-index: 500;
+        }
+
+        #iphone-screen {
+            position: relative;
+            width: var(--iphone-screen-w);
+            height: var(--iphone-screen-h);
+            border-radius: 50px;
+            overflow: hidden;
+            background: #FBFBFD;
+            isolation: isolate;
+        }
+
+        /* Hardware details */
+        .dynamic-island {
+            position: absolute;
+            z-index: 600;
+            top: 22px;
+            left: 50%;
+            width: 112px;
+            height: 31px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: #050505;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.035);
+            pointer-events: none;
+        }
+        .dynamic-island::after {
+            content: '';
+            position: absolute;
+            right: 9px;
+            top: 10px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #253552 0 18%, #0b1019 48%, #020202 75%);
+            opacity: .9;
+        }
+        .iphone-side-button {
+            position: absolute;
+            background: linear-gradient(180deg, #3f3f42, #151517);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+            z-index: -1;
+        }
+        .iphone-side-button.action { left: -3px; top: 115px; width: 4px; height: 34px; border-radius: 3px 0 0 3px; }
+        .iphone-side-button.volume-up { left: -3px; top: 170px; width: 4px; height: 61px; border-radius: 3px 0 0 3px; }
+        .iphone-side-button.volume-down { left: -3px; top: 242px; width: 4px; height: 61px; border-radius: 3px 0 0 3px; }
+        .iphone-side-button.power { right: -3px; top: 190px; width: 4px; height: 96px; border-radius: 0 3px 3px 0; }
+
+        /* All prototype overlays are constrained to the phone, never the browser window. */
+        #iphone-screen .fixed { position: absolute !important; }
+        #iphone-screen #mobile-footer { display: block !important; }
+        #iphone-screen #explore-grid { grid-template-columns: minmax(0, 1fr) !important; }
+        #iphone-screen #view-publish-skill .sheet-content { height: 90% !important; }
+        #iphone-screen #view-my-skills .sheet-content { height: 85% !important; }
+        #iphone-screen #view-wallet .sheet-content { height: 92% !important; }
+        #iphone-screen #view-skill-detail > div:first-child { height: 45% !important; }
+
+        /* iPhone safe areas for controls that opt into them. */
+        #iphone-screen .pt-safe-top { padding-top: 38px !important; }
+        #iphone-screen .top-safe-top { top: 50px !important; }
+        #iphone-screen .pb-safe-bottom { padding-bottom: 24px !important; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .bg-mesh-light {
+            background-color: #FBFBFD;
+            background-image: radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.04) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="font-sans h-screen w-screen overflow-hidden text-gray-900 selection:bg-primary selection:text-white">
+
+    <div id="iphone-stage">
+        <div id="iphone-device" aria-label="iPhone prototype frame">
+            <span class="iphone-side-button action"></span>
+            <span class="iphone-side-button volume-up"></span>
+            <span class="iphone-side-button volume-down"></span>
+            <span class="iphone-side-button power"></span>
+            <div id="iphone-screen">
+
+    <section class="fixed inset-0 w-full h-full z-[60] bg-black flex flex-col items-center justify-center text-white overflow-hidden" id="welcome">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/30 rounded-full blur-[120px] mix-blend-screen pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col items-center">
+            <div class="w-24 h-24 bg-white/5 backdrop-blur-2xl rounded-[2rem] border border-white/10 flex items-center justify-center mb-8 shadow-float animate-pop-spring">
+                <i class="fas fa-balance-scale-right text-4xl text-white"></i>
+            </div>
+            <h1 class="text-5xl font-black mb-4 tracking-tighter text-white drop-shadow-md">SkillShare</h1>
+            <p class="text-white/60 text-lg mb-12 font-medium tracking-widest uppercase">重新定义知识价值</p>
+            
+            <button onclick="enterApp()" class="group relative px-10 py-4 bg-white text-black font-bold rounded-full overflow-hidden active:scale-95 transition-all duration-300">
+                <span class="relative z-10 flex items-center">开启探索 <i class="fas fa-arrow-right ml-2 opacity-50 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i></span>
+            </button>
+        </div>
+    </section>
+
+    <div id="app-layout" class="hidden h-full w-full flex flex-col bg-mesh-light origin-center transition-all duration-500">
+        
+        <nav id="top-nav" class="z-20 flex-none pt-safe-top sticky top-0 transition-all duration-300 bg-transparent border-transparent w-full">
+            <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center w-full">
+                <div class="flex items-center font-black text-xl tracking-tight cursor-pointer" onclick="switchTab('home')">
+                    <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center mr-2"><i class="fas fa-balance-scale-right text-white text-xs"></i></div>
+                    SkillShare.
+                </div>
+                <div class="flex items-center cursor-pointer active:scale-95 transition-transform" onclick="switchTab('profile')">
+                    <div class="w-10 h-10 rounded-full p-[2px] bg-gradient-to-br from-gray-200 to-gray-400 shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" class="w-full h-full rounded-full border-2 border-white object-cover">
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main id="main-scroll-area" class="flex-1 overflow-y-auto no-scrollbar relative w-full -mt-16 pt-16">
+            
+            <div id="home" class="tab-content block pb-32">
+                <div class="px-5 pt-4">
+                    <div class="bg-black rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-float">
+                        <div class="absolute -top-20 -right-20 w-80 h-80 bg-secondary/40 rounded-full blur-[80px]"></div>
+                        <div class="relative z-10">
+                            <div class="inline-flex items-center bg-white/10 backdrop-blur-md rounded-full px-3 py-1.5 text-[10px] font-bold mb-6 border border-white/10 tracking-widest uppercase">
+                                <span class="w-1.5 h-1.5 rounded-full bg-success mr-2 animate-pulse"></span> 平台已促成 12,500+ 次公平互换
+                            </div>
+                            <h1 class="text-4xl font-black mb-4 leading-[1.1] tracking-tight">知识交换，<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">从未如此公平。</span></h1>
+                            <p class="text-white/60 text-sm mb-8 font-medium max-w-[85%] leading-relaxed">自由设定技能差价，平台担保交易。打破壁垒，让每一份热爱都能变现。</p>
+                            <button onclick="switchTab('explore')" class="bg-white text-black text-sm font-bold py-4 px-8 rounded-full shadow-lg active:scale-95 transition-all w-full text-center">
+                                发现优质技能
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-6 mt-10">
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">热点专区</h2>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div onclick="showToast('正在为您匹配 AI 技能池')" class="bg-gradient-to-br from-indigo-50 to-white p-4 rounded-2xl shadow-sm border border-indigo-100 flex flex-col items-start active:scale-95 transition-all cursor-pointer">
+                            <i class="fas fa-robot text-2xl text-indigo-500 mb-2"></i>
+                            <h3 class="font-bold text-gray-900 text-sm">AI 效率工具</h3>
+                            <p class="text-[10px] text-gray-500 mt-1">Prompt / Midjourney</p>
+                        </div>
+                        <div onclick="showToast('正在为您匹配设计技能池')" class="bg-gradient-to-br from-rose-50 to-white p-4 rounded-2xl shadow-sm border border-rose-100 flex flex-col items-start active:scale-95 transition-all cursor-pointer">
+                            <i class="fas fa-paint-brush text-2xl text-rose-500 mb-2"></i>
+                            <h3 class="font-bold text-gray-900 text-sm">视觉与设计</h3>
+                            <p class="text-[10px] text-gray-500 mt-1">UIUX / 摄影后期</p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Core Features</h2>
+                    <div class="space-y-4">
+                        <div class="bg-white p-5 rounded-[1.5rem] shadow-soft border border-gray-100/50 flex items-center">
+                            <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mr-4"><i class="fas fa-coins text-2xl text-gray-900"></i></div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 text-base mb-1">弹性差价系统</h3>
+                                <p class="text-xs text-gray-500 font-medium">弥合高频与低频技能间的市价鸿沟</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-[1.5rem] shadow-soft border border-gray-100/50 flex items-center">
+                            <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mr-4"><i class="fas fa-shield-check text-2xl text-gray-900"></i></div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 text-base mb-1">全链路资金托管</h3>
+                                <p class="text-xs text-gray-500 font-medium">履约驱动的智能分账逻辑，安全无忧</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="explore" class="tab-content hidden pb-32 px-5 pt-4">
+                <div class="flex space-x-3 mb-6 overflow-x-auto no-scrollbar pb-2">
+                    <button onclick="toggleFilter(this)" class="bg-primary text-white text-xs px-5 py-2.5 rounded-full shadow-md transition-all active:scale-95 font-bold shrink-0">为您推荐</button>
+                    <button onclick="toggleFilter(this)" class="bg-white border border-gray-200 text-gray-500 text-xs px-5 py-2.5 rounded-full transition-all active:scale-95 font-medium shrink-0">产品与企划</button>
+                    <button onclick="toggleFilter(this)" class="bg-white border border-gray-200 text-gray-500 text-xs px-5 py-2.5 rounded-full transition-all active:scale-95 font-medium shrink-0">AI 技能</button>
+                    <button onclick="toggleFilter(this)" class="bg-white border border-gray-200 text-gray-500 text-xs px-5 py-2.5 rounded-full transition-all active:scale-95 font-medium shrink-0">兴趣生活</button>
+                </div>
+                
+                <div id="explore-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity duration-300">
+                    
+                    <div class="bg-white rounded-[2rem] shadow-soft overflow-hidden group cursor-pointer active:scale-[0.97] transition-all duration-300 border border-gray-100" 
+                         onclick="openSubView('view-skill-detail', {img:'https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3', title:'AI 工具提效与 Prompt 进阶', user:'Alex C.', price:'¥200/次', tag:'AI 技能'})">
+                        <div class="relative h-48 overflow-hidden bg-gray-100">
+                            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-black text-xs font-black px-3 py-1.5 rounded-full shadow-sm">市价 ¥200/次</div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">AI 技能</span>
+                                <div class="flex items-center text-xs font-bold text-gray-900"><i class="fas fa-star mr-1 text-black"></i> 5.0</div>
+                            </div>
+                            <h3 class="font-bold text-lg text-gray-900 leading-tight mb-3">大模型 AI 工具提效与 Prompt 进阶指南</h3>
+                            <div class="flex items-center text-sm font-medium text-gray-500">
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1" class="w-6 h-6 rounded-full mr-2"> Alex C. · 高级架构师
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-[2rem] shadow-soft overflow-hidden group cursor-pointer active:scale-[0.97] transition-all duration-300 border border-gray-100" 
+                         onclick="openSubView('view-skill-detail', {img:'https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3', title:'高阶 UI/UX 交互走查', user:'Sarah Lee', price:'¥150/h', tag:'设计'})">
+                        <div class="relative h-48 overflow-hidden bg-gray-100">
+                            <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-black text-xs font-black px-3 py-1.5 rounded-full shadow-sm">建议差价 ¥150</div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">设计</span>
+                                <div class="flex items-center text-xs font-bold text-gray-900"><i class="fas fa-star mr-1 text-black"></i> 4.9</div>
+                            </div>
+                            <h3 class="font-bold text-lg text-gray-900 leading-tight mb-3">高阶 UI/UX 交互走查与体验优化</h3>
+                            <div class="flex items-center text-sm font-medium text-gray-500">
+                                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1" class="w-6 h-6 rounded-full mr-2"> Sarah Lee · 资深设计师
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-[2rem] shadow-soft overflow-hidden group cursor-pointer active:scale-[0.97] transition-all duration-300 border border-gray-100" 
+                         onclick="openSubView('view-skill-detail', {img:'https://images.unsplash.com/photo-1511886929837-354d827aae26?ixlib=rb-4.0.3', title:'零基础单反摄影入门', user:'Tom Hanks', price:'纯互换', tag:'兴趣生活'})">
+                        <div class="relative h-48 overflow-hidden bg-gray-100">
+                            <img src="https://images.unsplash.com/photo-1511886929837-354d827aae26?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-black text-xs font-black px-3 py-1.5 rounded-full shadow-sm">纯互换</div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">兴趣生活</span>
+                                <div class="flex items-center text-xs font-bold text-gray-900"><i class="fas fa-star mr-1 text-black"></i> 4.8</div>
+                            </div>
+                            <h3 class="font-bold text-lg text-gray-900 leading-tight mb-3">零基础单反摄影入门与构图教学</h3>
+                            <div class="flex items-center text-sm font-medium text-gray-500">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1" class="w-6 h-6 rounded-full mr-2"> Tom H. · 自由摄影师
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="matches" class="tab-content hidden pb-32 px-5 pt-4">
+                <h2 class="text-3xl font-black text-gray-900 mb-8 tracking-tight">交易看板</h2>
+                
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">待处理请求</h3>
+                <div id="requests-list">
+                    <div id="request-card-1" class="bg-white rounded-[2rem] shadow-soft border border-gray-100 p-5 mb-4">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center">
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1" class="w-12 h-12 rounded-full mr-4 bg-gray-100 object-cover">
+                                <div>
+                                    <div class="font-bold text-gray-900">Emma Watson</div>
+                                    <div class="text-xs text-gray-500 font-medium mt-1">希望交换你的 <span class="text-black font-bold">AI 工具实战</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 rounded-[1rem] p-4 mb-5 border border-gray-100/50">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs text-gray-500 font-medium">对方愿意补足差价</span>
+                                <span class="text-success font-black">+ ¥120.00</span>
+                            </div>
+                            <p class="text-xs text-gray-600 font-medium">"我的 UI 技能可能价值相对较低，愿意补这部分差价，希望能系统学一下 Prompt！"</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="handleMatchAction('accept', 'request-card-1', event)" class="flex-1 bg-primary text-white py-3.5 rounded-full text-sm font-bold active:scale-95 transition-transform shadow-md">接受并托管差价</button>
+                            <button onclick="handleMatchAction('reject', 'request-card-1', event)" class="w-14 bg-gray-100 text-gray-600 py-3.5 rounded-full flex items-center justify-center active:scale-95 transition-transform"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="request-card-2" class="bg-white rounded-[2rem] shadow-soft border border-gray-100 p-5 mb-8">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1" class="w-12 h-12 rounded-full mr-4 bg-gray-100 object-cover">
+                                <div>
+                                    <div class="font-bold text-gray-900">Chloe Smith</div>
+                                    <div class="text-xs text-gray-500 font-medium mt-1">希望交换你的 <span class="text-black font-bold">商业计划书重构</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 rounded-[1rem] p-4 mb-5 border border-gray-100/50">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-500 font-medium">纯互换请求</span>
+                                <span class="text-gray-900 font-black">¥0.00</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="handleMatchAction('accept', 'request-card-2', event)" class="flex-1 bg-primary text-white py-3.5 rounded-full text-sm font-bold active:scale-95 transition-transform shadow-md">同意交换</button>
+                            <button onclick="handleMatchAction('reject', 'request-card-2', event)" class="w-14 bg-gray-100 text-gray-600 py-3.5 rounded-full flex items-center justify-center active:scale-95 transition-transform"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="empty-request-state" class="hidden bg-transparent border-2 border-dashed border-gray-200 rounded-[2rem] p-8 text-center mb-8">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-inbox text-2xl text-gray-400"></i></div>
+                    <h4 class="font-bold text-gray-900 mb-1">暂无待处理请求</h4>
+                    <p class="text-xs text-gray-500">发布更多技能吸引搭子吧</p>
+                </div>
+
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">进行中订单</h3>
+                <div id="in-progress-list" class="space-y-4">
+                    <div class="bg-white rounded-[2rem] shadow-soft border border-gray-100 p-5 cursor-pointer active:scale-[0.98] transition-transform" onclick="showToast('履约中，完成后资金自动到账')">
+                        <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-50">
+                            <div class="flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-yellow-400 mr-2 animate-pulse"></span>
+                                <span class="text-xs font-bold text-gray-700">服务进行中</span>
+                            </div>
+                            <span class="text-[10px] text-gray-400 font-mono">ID: BP99281A</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-5">
+                            <span class="font-extrabold text-sm text-gray-900">产品架构梳理</span>
+                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 mx-2"><i class="fas fa-exchange-alt text-xs"></i></div>
+                            <span class="font-extrabold text-sm text-gray-900">英语口语</span>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-xl flex justify-between items-center text-sm border border-gray-100">
+                            <span class="text-gray-500 font-medium text-xs">补差价 (托管中)</span>
+                            <span class="text-gray-900 font-bold">- ¥50.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="messages" class="tab-content hidden pb-32 px-5 pt-4">
+                <h2 class="text-3xl font-black text-gray-900 mb-8 tracking-tight">消息中心</h2>
+                <div class="bg-white rounded-[2rem] shadow-soft border border-gray-100 divide-y divide-gray-50">
+                    <div onclick="openSubView('view-chat', {user: 'David Wilson'})" class="flex items-center p-5 hover:bg-gray-50 active:bg-gray-100 transition cursor-pointer">
+                        <div class="relative mr-4">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1" class="w-14 h-14 rounded-full object-cover">
+                            <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full"></span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-1">
+                                <span class="font-bold text-gray-900">David Wilson</span>
+                                <span class="text-xs text-gray-400 font-medium">10:30</span>
+                            </div>
+                            <p class="text-xs text-gray-900 font-bold truncate">那个差价我觉得可以，这周末有空吗？</p>
+                        </div>
+                    </div>
+                    <div onclick="openSubView('view-chat', {user: 'Emma Watson'})" class="flex items-center p-5 hover:bg-gray-50 active:bg-gray-100 transition cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1" class="w-14 h-14 rounded-full object-cover grayscale opacity-80">
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-1">
+                                <span class="font-bold text-gray-600">Emma Watson</span>
+                                <span class="text-xs text-gray-400 font-medium">昨天</span>
+                            </div>
+                            <p class="text-xs text-gray-500 truncate font-medium">我已经发起交换请求了，请确认一下！</p>
+                        </div>
+                    </div>
+                    <div onclick="openSubView('view-chat', {user: '系统助手'})" class="flex items-center p-5 hover:bg-gray-50 active:bg-gray-100 transition cursor-pointer">
+                        <div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center mr-4">
+                            <i class="fas fa-robot text-white text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-1">
+                                <span class="font-bold text-gray-900">SkillShare 助手</span>
+                                <span class="text-xs text-gray-400 font-medium">周一</span>
+                            </div>
+                            <p class="text-xs text-gray-500 truncate font-medium">您的订单 BP99281A 履约时间已过半...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile" class="tab-content hidden pb-32 px-5 pt-4">
+                <div onclick="openSubView('view-wallet')" class="w-full aspect-[1.6/1] bg-dark rounded-[2.5rem] p-6 text-white shadow-metal mb-8 relative overflow-hidden cursor-pointer active:scale-[0.97] transition-all flex flex-col justify-between">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-30"></div>
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full filter blur-[50px]"></div>
+                    <div class="relative z-10 flex justify-between items-start">
+                        <i class="fas fa-wifi text-white/50 transform rotate-90 text-lg"></i>
+                        <span class="text-[10px] font-black tracking-widest uppercase text-white/70">SkillShare Wallet</span>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="text-[10px] text-white/50 uppercase tracking-widest mb-1 font-semibold">Total Balance</div>
+                        <div class="text-4xl font-black tracking-tighter">¥ 245.<span class="text-2xl text-white/40">00</span></div>
+                    </div>
+                    <div class="relative z-10 flex justify-between items-end">
+                        <div class="font-medium text-xs tracking-widest text-white/80">JUNHAO ZHANG</div>
+                        <i class="fab fa-cc-mastercard text-3xl text-white/80"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[2rem] shadow-soft border border-gray-100 overflow-hidden mb-6">
+                    <div class="p-6 border-b border-gray-50 flex items-center">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" class="w-16 h-16 rounded-full mr-5 object-cover">
+                        <div>
+                            <div class="font-black text-xl text-gray-900 tracking-tight">Junhao Zhang</div>
+                            <div class="text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider mb-2">产品经理 · 信誉极好 780分</div>
+                            <div class="flex gap-1">
+                                <span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded-full font-bold">AI辅助</span>
+                                <span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded-full font-bold">摄影爱好</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-2">
+                        <div class="p-4 flex justify-between items-center hover:bg-gray-50 rounded-2xl cursor-pointer active:scale-[0.98] transition-all" onclick="openSubView('view-my-skills')">
+                            <div class="flex items-center text-sm font-bold text-gray-800">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center mr-4"><i class="fas fa-layer-group text-xs"></i></div>
+                                我的技能库
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                        </div>
+                        <div class="p-4 flex justify-between items-center hover:bg-gray-50 rounded-2xl cursor-pointer active:scale-[0.98] transition-all" onclick="showToast('功能建设中')">
+                            <div class="flex items-center text-sm font-bold text-gray-800">
+                                <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center mr-4"><i class="fas fa-history text-xs"></i></div>
+                                历史账单
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer id="mobile-footer" class="md:hidden fixed bottom-6 inset-x-6 bg-white/80 backdrop-blur-2xl rounded-full shadow-float border border-white/50 z-30 transition-all duration-500 w-[calc(100%-48px)]">
+            <div class="flex justify-around items-center h-[72px] px-2 relative">
+                <button data-target="home" onclick="switchTab('home')" class="mobile-nav-item flex-1 flex flex-col items-center justify-center text-primary h-full transition-all">
+                    <i class="fas fa-home text-[22px] mb-1 transition-all duration-300 scale-110 -translate-y-1"></i>
+                    <span class="text-[10px] transition-all duration-300 font-bold opacity-100">首页</span>
+                </button>
+                <button data-target="explore" onclick="switchTab('explore')" class="mobile-nav-item flex-1 flex flex-col items-center justify-center text-gray-400 h-full transition-all">
+                    <i class="fas fa-compass text-[22px] mb-1 transition-all duration-300"></i>
+                    <span class="text-[10px] transition-all duration-300 opacity-0 absolute bottom-2">发现</span>
+                </button>
+                <div class="relative -top-8 mx-1">
+                    <button onclick="openSubView('view-action-sheet')" class="bg-black text-white w-16 h-16 rounded-full shadow-[0_12px_24px_rgba(0,0,0,0.3)] flex items-center justify-center active:scale-90 transition-transform">
+                        <i class="fas fa-plus text-2xl"></i>
+                    </button>
+                </div>
+                <button data-target="matches" onclick="switchTab('matches')" class="mobile-nav-item flex-1 flex flex-col items-center justify-center text-gray-400 h-full transition-all">
+                    <i class="fas fa-sync-alt text-[22px] mb-1 transition-all duration-300"></i>
+                    <span class="text-[10px] transition-all duration-300 opacity-0 absolute bottom-2">交易</span>
+                </button>
+                <button data-target="profile" onclick="switchTab('profile')" class="mobile-nav-item flex-1 flex flex-col items-center justify-center text-gray-400 h-full transition-all">
+                    <i class="fas fa-user text-[22px] mb-1 transition-all duration-300"></i>
+                    <span class="text-[10px] transition-all duration-300 opacity-0 absolute bottom-2">我的</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <div id="view-action-sheet" class="hidden fixed inset-0 z-50 flex flex-col justify-end">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="closeSubView('view-action-sheet')"></div>
+        <div class="sheet-content bg-white rounded-t-[2.5rem] w-full p-8 relative z-10 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-8"></div>
+            <h3 class="text-2xl font-black text-gray-900 mb-6 tracking-tight">你想做什么？</h3>
+            <div class="space-y-4 mb-4">
+                <button onclick="closeSubView('view-action-sheet'); setTimeout(() => openSubView('view-publish-skill'), 400)" class="w-full bg-gray-50 p-5 rounded-3xl flex items-center active:scale-[0.98] transition-transform text-left border border-gray-100">
+                    <div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-black mr-5 text-xl"><i class="fas fa-paper-plane"></i></div>
+                    <div>
+                        <div class="font-bold text-gray-900 text-lg">发布新技能</div>
+                        <div class="text-xs text-gray-500 font-medium mt-1">展示专长，等待匹配</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-publish-skill" class="hidden fixed inset-0 z-50 flex flex-col justify-end">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSubView('view-publish-skill')"></div>
+        <div class="sheet-content bg-surface rounded-t-[2.5rem] w-full p-6 relative z-10 h-[90vh] flex flex-col shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 shrink-0"></div>
+            <div class="flex justify-between items-center mb-8 shrink-0 px-2">
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight">发布互换技能</h3>
+                <button onclick="closeSubView('view-publish-skill')" class="w-8 h-8 bg-gray-200/50 rounded-full flex items-center justify-center text-gray-500"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-6 space-y-8 px-2">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">技能分类</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="selectTag(this)" class="px-4 py-2 bg-black text-white rounded-full text-xs font-bold transition-colors border border-transparent">商业企划</button>
+                        <button type="button" onclick="selectTag(this)" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-xs font-bold transition-colors border border-gray-200">程序开发</button>
+                        <button type="button" onclick="selectTag(this)" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-xs font-bold transition-colors border border-gray-200">AI工具</button>
+                        <button type="button" onclick="selectTag(this)" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-xs font-bold transition-colors border border-gray-200">设计/摄影</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">技能详情</label>
+                    <input type="text" placeholder="输入技能名称（如：商业计划书重构）" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 font-bold outline-none mb-3 placeholder-gray-300">
+                    <textarea placeholder="简述你的专业背景与能提供的价值..." rows="3" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 text-sm outline-none resize-none placeholder-gray-300"></textarea>
+                </div>
+
+                <div class="bg-gray-200/50 p-1.5 rounded-full flex relative">
+                    <div class="absolute top-1.5 bottom-1.5 left-1.5 w-[calc(50%-6px)] bg-white rounded-full shadow-sm transition-transform duration-300" id="mode-slider"></div>
+                    <button type="button" onclick="document.getElementById('mode-slider').style.transform='translateX(0)'; document.getElementById('moneyExchangeSection').classList.add('hidden');" class="flex-1 py-3 text-sm font-bold rounded-full text-gray-900 relative z-10">纯粹互换</button>
+                    <button type="button" onclick="document.getElementById('mode-slider').style.transform='translateX(100%)'; document.getElementById('moneyExchangeSection').classList.remove('hidden'); document.getElementById('moneyExchangeSection').classList.add('animate-fade-in');" class="flex-1 py-3 text-sm font-bold rounded-full text-gray-900 relative z-10">设定补差价</button>
+                </div>
+
+                <div id="moneyExchangeSection" class="hidden">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">建议对方支付差价 (CNY)</label>
+                    <div class="relative mb-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all p-2">
+                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-2xl">¥</span>
+                        <input type="number" id="gapAmount" oninput="updateFeeCalculation()" class="w-full pl-14 pr-6 py-5 bg-transparent text-3xl font-black text-gray-900 outline-none placeholder-gray-200" placeholder="0">
+                    </div>
+                    <div class="bg-gray-100/50 p-5 rounded-[1.5rem] space-y-3 text-xs font-medium text-gray-500 border border-gray-100">
+                        <div class="flex justify-between"><span>平台技术服务费 (10%)</span><span id="platformFee" class="text-gray-900 font-bold">¥0.00</span></div>
+                        <div class="w-full h-px bg-gray-200/50 my-2"></div>
+                        <div class="flex justify-between text-sm"><span>实际预计到账</span><span id="actualTotal" class="text-black font-black">¥0.00</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pt-4 shrink-0 bg-surface">
+                <button onclick="closeSubView('view-publish-skill'); setTimeout(()=>showToast('技能发布成功！'),400);" class="w-full bg-black text-white py-4.5 rounded-full font-bold text-base active:scale-[0.98] transition-transform shadow-[0_10px_20px_rgba(0,0,0,0.2)]">确认发布</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-my-skills" class="hidden fixed inset-0 z-50 flex flex-col justify-end">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSubView('view-my-skills')"></div>
+        <div class="sheet-content bg-surface rounded-t-[2.5rem] w-full relative z-10 h-[85vh] flex flex-col overflow-hidden shadow-[0_-20px_40px_rgba(0,0,0,0.2)]">
+             <div class="bg-white pt-6 pb-6 px-6 border-b border-gray-100 shrink-0">
+                <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
+                <div class="flex justify-between items-center">
+                    <button onclick="closeSubView('view-my-skills')" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
+                    <span class="font-black tracking-wide text-lg text-gray-900">我的技能库</span>
+                    <button class="w-8 h-8 flex items-center justify-center text-primary" onclick="closeSubView('view-my-skills'); setTimeout(() => openSubView('view-publish-skill'), 400)"><i class="fas fa-plus text-lg"></i></button>
+                </div>
+             </div>
+             <div class="flex-1 p-6 overflow-y-auto space-y-4">
+                 <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-gray-100">
+                     <div class="flex justify-between items-start mb-3">
+                         <span class="bg-success/10 text-success text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">展示中</span>
+                         <i class="fas fa-ellipsis-h text-gray-400"></i>
+                     </div>
+                     <h4 class="font-bold text-gray-900 text-lg mb-1">AI 提效工具与产品策划指导</h4>
+                     <div class="text-sm text-gray-500 font-medium mb-4">建议差价: <span class="font-bold text-gray-900">¥150.00</span></div>
+                     <div class="flex gap-2">
+                         <button class="flex-1 bg-gray-100 text-gray-900 py-3 rounded-xl text-xs font-bold active:scale-95 transition-transform">编辑</button>
+                         <button class="flex-1 bg-gray-100 text-red-500 py-3 rounded-xl text-xs font-bold active:scale-95 transition-transform">下架</button>
+                     </div>
+                 </div>
+                 
+                 <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-gray-100">
+                     <div class="flex justify-between items-start mb-3">
+                         <span class="bg-success/10 text-success text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">展示中</span>
+                         <i class="fas fa-ellipsis-h text-gray-400"></i>
+                     </div>
+                     <h4 class="font-bold text-gray-900 text-lg mb-1">人像与风光摄影精讲</h4>
+                     <div class="text-sm text-gray-500 font-medium mb-4">建议差价: <span class="font-bold text-gray-900">¥50.00</span></div>
+                     <div class="flex gap-2">
+                         <button class="flex-1 bg-gray-100 text-gray-900 py-3 rounded-xl text-xs font-bold active:scale-95 transition-transform">编辑</button>
+                         <button class="flex-1 bg-gray-100 text-red-500 py-3 rounded-xl text-xs font-bold active:scale-95 transition-transform">下架</button>
+                     </div>
+                 </div>
+
+                 <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-gray-100 opacity-60 grayscale">
+                     <div class="flex justify-between items-start mb-3">
+                         <span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">已下架</span>
+                     </div>
+                     <h4 class="font-bold text-gray-900 text-lg mb-1">篮球基础与体能训练</h4>
+                     <div class="text-sm text-gray-500 font-medium mb-4">纯互换</div>
+                     <button class="w-full bg-black text-white py-3 rounded-xl text-xs font-bold active:scale-95 transition-transform">重新上架</button>
+                 </div>
+             </div>
+        </div>
+    </div>
+
+    <div id="view-skill-detail" class="hidden fixed inset-0 bg-white z-40 overflow-y-auto pb-20">
+        <div class="relative h-[45vh] bg-gray-200">
+            <img id="detail-img" src="" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            <button onclick="closeSubView('view-skill-detail')" class="absolute top-safe-top left-6 w-10 h-10 bg-white/70 backdrop-blur-xl rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                <i class="fas fa-arrow-left text-gray-900"></i>
+            </button>
+            <div class="absolute bottom-6 left-6">
+                <span id="detail-tag" class="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full border border-white/20 uppercase tracking-wider"></span>
+            </div>
+        </div>
+        <div class="p-8 -mt-6 bg-white rounded-t-[2.5rem] relative">
+            <div class="flex justify-between items-start mb-4">
+                <h1 id="detail-title" class="text-2xl font-black text-gray-900 leading-tight"></h1>
+            </div>
+            <div class="flex items-center justify-between mb-8 pb-8 border-b border-gray-100">
+                <div class="flex items-center">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1" class="w-10 h-10 rounded-full mr-3 object-cover shadow-sm">
+                    <div>
+                        <div id="detail-user" class="text-sm font-bold text-gray-900"></div>
+                        <div class="text-xs font-medium text-gray-400 mt-0.5"><i class="fas fa-star text-yellow-400 mr-1"></i> 5.0 极好</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">差价要求</div>
+                    <div id="detail-price" class="text-xl font-black text-primary"></div>
+                </div>
+            </div>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-black text-lg mb-3 text-gray-900">技能描述</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed font-medium">
+                        我可以提供专业的实战指导，帮助你解决在学习和业务中遇到的痛点。我有丰富的实战经验，擅长用通俗易懂的方式讲解复杂概念，避免走弯路，为你节省大量试错成本。
+                    </p>
+                </div>
+                <div>
+                    <h3 class="font-black text-lg mb-3 text-gray-900">历史评价 (12)</h3>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <div class="flex items-center justify-between text-xs mb-2">
+                            <span class="font-bold text-gray-900">Tom H.</span>
+                            <span class="text-yellow-500 font-bold"><i class="fas fa-star"></i> 5.0</span>
+                        </div>
+                        <p class="text-xs text-gray-500 font-medium leading-relaxed">讲得非常透彻，干货满满，这几十块钱的差价补得太值了，比外面报班强很多！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fixed bottom-0 left-0 right-0 p-6 bg-white/90 backdrop-blur-2xl border-t border-gray-100/50 pb-safe-bottom">
+            <button onclick="closeSubView('view-skill-detail'); setTimeout(()=>openSubView('view-publish-skill'), 400)" class="w-full bg-black text-white font-bold py-4.5 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-transform">申请互换</button>
+        </div>
+    </div>
+
+    <div id="view-chat" class="hidden fixed inset-0 bg-surface z-40 flex flex-col">
+        <div class="bg-white/80 backdrop-blur-xl px-4 py-3 border-b border-gray-100 flex items-center justify-between pt-safe-top z-10">
+            <button onclick="closeSubView('view-chat')" class="w-10 h-10 flex items-center justify-center active:scale-90 transition-transform"><i class="fas fa-arrow-left text-gray-900"></i></button>
+            <h3 id="chat-title" class="font-bold text-gray-900 text-lg">User</h3>
+            <button class="w-10 h-10 flex items-center justify-center"><i class="fas fa-ellipsis-h text-gray-900"></i></button>
+        </div>
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <div class="flex justify-start">
+                <div class="bg-white text-gray-900 px-5 py-3.5 rounded-[1.5rem] rounded-tl-sm shadow-sm border border-gray-100 max-w-[80%] font-medium text-sm">
+                    你好，我对你的技能很感兴趣，差价可以直接走平台托管吗？
+                </div>
+            </div>
+        </div>
+        <div class="bg-white p-4 border-t border-gray-100 pb-safe-bottom">
+            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2 focus-within:border-black transition-colors">
+                <input id="chat-input" type="text" class="flex-1 bg-transparent outline-none text-sm font-medium py-2 placeholder-gray-400" placeholder="发送消息 (按回车发送)...">
+                <button onclick="sendMessage()" class="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center ml-2 shadow-sm active:scale-90 transition-transform"><i class="fas fa-paper-plane text-xs"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-wallet" class="hidden fixed inset-0 z-50 flex flex-col justify-end">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSubView('view-wallet')"></div>
+        <div class="sheet-content bg-surface rounded-t-[2.5rem] w-full relative z-10 h-[92vh] flex flex-col overflow-hidden shadow-[0_-20px_40px_rgba(0,0,0,0.2)]">
+             <div class="bg-white pt-6 pb-12 px-6 border-b border-gray-100 shrink-0">
+                <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 shrink-0"></div>
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="closeSubView('view-wallet')" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center active:scale-90 transition-transform"><i class="fas fa-times"></i></button>
+                    <span class="font-bold tracking-widest uppercase text-xs text-gray-400">Wallet</span>
+                    <div class="w-8"></div>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-black mb-8 tracking-tighter text-gray-900">¥ 95.<span class="text-2xl text-gray-300">00</span></div>
+                    <button onclick="closeSubView('view-wallet'); setTimeout(()=>showToast('提现处理中，预计2小时到账'),400)" class="bg-black text-white px-12 py-3.5 rounded-full font-bold shadow-[0_10px_20px_rgba(0,0,0,0.2)] active:scale-95 transition-transform">提现至微信</button>
+                </div>
+             </div>
+             <div class="flex-1 p-6 overflow-y-auto">
+                 <h3 class="font-bold text-gray-400 mb-6 text-xs uppercase tracking-widest">最新交易流水</h3>
+                 <div class="space-y-4">
+                     <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-gray-50 flex justify-between items-center">
+                         <div class="flex items-center">
+                             <div class="w-12 h-12 rounded-full bg-emerald-50 text-success flex items-center justify-center mr-4"><i class="fas fa-arrow-down"></i></div>
+                             <div>
+                                 <div class="font-bold text-sm text-gray-900">平台托管解冻 (补差价)</div>
+                                 <div class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">今日 10:30</div>
+                             </div>
+                         </div>
+                         <div class="font-black text-gray-900 text-lg">+120.00</div>
+                     </div>
+                     <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-gray-50 flex justify-between items-center">
+                         <div class="flex items-center">
+                             <div class="w-12 h-12 rounded-full bg-gray-50 text-gray-900 flex items-center justify-center mr-4"><i class="fas fa-arrow-up"></i></div>
+                             <div>
+                                 <div class="font-bold text-sm text-gray-900">支付差价 (David)</div>
+                                 <div class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">昨天 14:20</div>
+                             </div>
+                         </div>
+                         <div class="font-black text-gray-900 text-lg">-150.00</div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+    </div>
+
+            </div>
+            <div class="dynamic-island" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    <script>
+        // Keep the logical app viewport at iPhone 15/15 Pro CSS size (393×852),
+        // while scaling the whole physical phone down only when the browser is smaller.
+        function fitIPhonePrototype() {
+            const outerWidth = 417;
+            const outerHeight = 876;
+            const margin = 28;
+            const scale = Math.min(1, (window.innerWidth - margin) / outerWidth, (window.innerHeight - margin) / outerHeight);
+            document.documentElement.style.setProperty('--iphone-scale', Math.max(0.35, scale).toFixed(4));
+        }
+        fitIPhonePrototype();
+        window.addEventListener('resize', fitIPhonePrototype);
+    </script>
+</body>
+</html>
