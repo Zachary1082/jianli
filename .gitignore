@@ -11,3 +11,11 @@
 !public/**
 !.github/
 !.github/**
+!产品经理网站/
+产品经理网站/*
+!产品经理网站/index.html
+!产品经理网站/.gitignore
+!产品经理网站/package.json
+!产品经理网站/pnpm-lock.yaml
+!产品经理网站/src/
+!产品经理网站/src/**

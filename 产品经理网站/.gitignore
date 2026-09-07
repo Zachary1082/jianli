@@ -1,0 +1,4 @@
+# Product-manager deployment reuses the root site's public media.
+node_modules/
+dist/
+public/

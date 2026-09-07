@@ -36,7 +36,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm exec vite build --base=/jianli/
+        run: |
+          pnpm exec vite build --base=/jianli/
+          mkdir -p site/product-manager
+          cp -r dist/. site/
+          pnpm --dir "产品经理网站" install --frozen-lockfile
+          pnpm --dir "产品经理网站" run build --base=/jianli/product-manager/
+          cp -r "产品经理网站/dist/." site/product-manager/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -46,7 +52,7 @@ jobs:
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: site
 
   deploy:
     environment:

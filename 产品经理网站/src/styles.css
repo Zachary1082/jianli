@@ -708,25 +708,27 @@
 .site .education-grid h3 em{padding:6px 10px;border:1px solid #e3c17f70;border-radius:999px;color:#e8ca91;font:750 12px/1.2 Manrope,'PingFang SC',sans-serif;letter-spacing:.025em;font-style:normal;white-space:nowrap}
 @media(max-width:560px){.site .education-grid article{padding-right:28px}.site .education-emblem{width:68px;height:68px;top:20px;right:18px}.site .education-grid article>.kicker{padding-right:76px}}
 
-/* Bilingual navigation and English-length layout safeguards. */
-.site .language-toggle{display:flex;align-items:center;gap:7px;padding:5px 8px 5px 5px;border:1px solid #ffffff2d;border-radius:999px;background:#08172b80;color:#f4efe7;cursor:pointer;font:700 10px/1 'DM Mono',monospace;letter-spacing:.05em;transition:border-color .25s ease,background .25s ease,transform .25s ease}
-.site .language-toggle span{display:grid;place-items:center;min-width:25px;height:25px;padding:0 5px;border-radius:999px;background:#e3c17f;color:#07101d}
-.site .language-toggle b{font-weight:600;color:#b9c5d3}
-.site .language-toggle:hover{border-color:#e3c17f80;background:#10243e;transform:translateY(-1px)}
-.site .language-toggle:focus-visible{outline:2px solid #e3c17f;outline-offset:3px}
-.site.lang-en .hero-v2 .hero-copy{width:min(980px,55vw)}
-.site.lang-en .hero-v2 .hero-copy h1{font-size:clamp(64px,5.45vw,104px);line-height:.93;letter-spacing:-.065em}
-.site.lang-en .hero-v2 .hero-copy h1 em{transform:translateX(clamp(24px,2.8vw,48px))}
-.site.lang-en .hero-desc{max-width:650px}
-.site.lang-en .hero-fit-top>strong{font-size:16px}
-.site.lang-en .hero-fit-tabs button{padding-inline:10px}
-.site.lang-en .intro-text h2{font-size:clamp(42px,5vw,76px);letter-spacing:-.055em}
-.site.lang-en .work-heading h3{font-size:clamp(34px,3.55vw,55px);letter-spacing:-.045em}
-.site.lang-en .career-title h3{font-size:clamp(22px,2.35vw,36px);letter-spacing:-.045em}
-.site.lang-en .education-grid h3{font-size:20px;line-height:1.25;letter-spacing:-.025em}
-.site.lang-en .education-grid article>span{display:block;max-width:260px;line-height:1.5}
-.site.lang-en .section-head h2,.site.lang-en .strength-intro h2{font-size:clamp(44px,5vw,76px);letter-spacing:-.055em}
-.site.lang-en .strength-card h3{font-size:27px;letter-spacing:-.025em}
-.site.lang-en .contact-main h2{font-size:clamp(42px,5vw,78px);line-height:1.02;letter-spacing:-.055em}
-@media(max-width:1200px){.site.lang-en .hero-v2 .hero-copy{width:min(720px,66vw)}.site>.nav nav{gap:22px}}
-@media(max-width:800px){.site .language-toggle{width:100%;justify-content:flex-start}.site.lang-en .hero-v2 .hero-copy{width:100%}.site.lang-en .hero-v2 .hero-copy h1{font-size:clamp(54px,14vw,82px)}.site.lang-en .hero-v2 .hero-copy h1 em{transform:none}.site.lang-en .section h2{font-size:clamp(40px,12vw,64px)}.site.lang-en .education-grid h3{padding-right:58px}}
+/* Bilingual navigation and English-specific rhythm. */
+.site > .nav nav{gap:clamp(14px,2vw,32px)}
+.lang-switch{display:flex;align-items:center;padding:3px;border:1px solid #e3c17f52;border-radius:999px;background:rgba(7,22,43,.38);backdrop-filter:blur(12px)}
+.lang-switch button{min-width:34px;height:28px;padding:0 8px;border:0;border-radius:999px;background:transparent;color:#a9b6c8;font:700 10px 'DM Mono',monospace;letter-spacing:.04em;cursor:pointer;transition:color .25s,background .25s,box-shadow .25s}
+.lang-switch button:hover{color:#f4efe7}
+.lang-switch button.is-active{color:#07101d;background:#e3c17f;box-shadow:0 4px 14px #0003}
+.lang-switch button:focus-visible{outline:2px solid #e3c17f;outline-offset:2px}
+.site.lang-en .brand{letter-spacing:-.025em}
+.site.lang-en .hero-v2 .hero-copy{width:min(1120px,61vw)}
+.site.lang-en .hero-v2 .hero-copy h1{font-size:clamp(58px,5.15vw,98px);line-height:.96;letter-spacing:-.055em}
+.site.lang-en .hero-v2 .hero-copy h1 span,.site.lang-en .hero-v2 .hero-copy h1 em{white-space:nowrap}
+.site.lang-en .hero-v2 .hero-copy h1 em{transform:translateX(clamp(22px,2.7vw,48px))}
+.site.lang-en .hero-desc{max-width:780px}
+.site.lang-en .hero-fit{width:min(760px,100%)}
+.site.lang-en .section h2{font-size:clamp(40px,4.7vw,76px);line-height:1.01;letter-spacing:-.055em}
+.site.lang-en .work-heading h3{font-size:clamp(34px,3.7vw,58px);letter-spacing:-.05em}
+.site.lang-en .education-grid h3{font-size:21px;line-height:1.18}
+.site.lang-en .strength-card h3{font-size:27px;line-height:1.1}
+.site.lang-en .strength-card strong{font-size:clamp(26px,3.4vw,50px);line-height:1.03}
+.site.lang-en .lab-copy h3{font-size:clamp(32px,2.8vw,52px);line-height:1.06}
+.site.lang-en .contact h2{font-size:clamp(44px,5vw,80px);line-height:1}
+.modal .case-modal{width:min(1240px,100%)}
+@media(max-width:1100px){.site.lang-en .hero-v2 .hero-copy{width:min(700px,67vw)}.site.lang-en .hero-v2 .hero-copy h1 span,.site.lang-en .hero-v2 .hero-copy h1 em{white-space:normal}.site.lang-en .hero-v2 .hero-copy h1{font-size:clamp(54px,6vw,76px)}}
+@media(max-width:800px){.site > .nav nav{gap:15px;min-width:230px}.lang-switch{order:-1;align-self:stretch;justify-content:space-between}.lang-switch button{width:50%}.site .hero-profile-card{display:none}.site.lang-en .brand{max-width:calc(100vw - 92px);font-size:12px}.site.lang-en .hero-v2 .hero-copy{width:100%;margin-top:80px}.site.lang-en .hero-v2 .hero-copy h1{font-size:clamp(49px,13.5vw,72px);line-height:.96}.site.lang-en .hero-v2 .hero-copy h1 em{transform:none}.site.lang-en .hero-desc{font-size:14px}.site.lang-en .section h2{font-size:clamp(39px,11vw,58px)}.site.lang-en .work-heading h3{font-size:clamp(37px,10vw,50px)}.site.lang-en .lab-copy h3{font-size:38px}.site.lang-en .contact h2{font-size:clamp(39px,10.5vw,56px)}}
