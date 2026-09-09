@@ -19,3 +19,11 @@
 !产品经理网站/pnpm-lock.yaml
 !产品经理网站/src/
 !产品经理网站/src/**
+!外贸网站/
+外贸网站/*
+!外贸网站/index.html
+!外贸网站/.gitignore
+!外贸网站/package.json
+!外贸网站/pnpm-lock.yaml
+!外贸网站/src/
+!外贸网站/src/**

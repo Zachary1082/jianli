@@ -43,6 +43,10 @@ jobs:
           pnpm --dir "产品经理网站" install --frozen-lockfile
           pnpm --dir "产品经理网站" run build --base=/jianli/product-manager/
           cp -r "产品经理网站/dist/." site/product-manager/
+          mkdir -p site/foreign-trade
+          pnpm --dir "外贸网站" install --frozen-lockfile
+          pnpm --dir "外贸网站" run build --base=/jianli/foreign-trade/
+          cp -r "外贸网站/dist/." site/foreign-trade/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
