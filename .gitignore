@@ -27,3 +27,11 @@
 !外贸网站/pnpm-lock.yaml
 !外贸网站/src/
 !外贸网站/src/**
+!通用简历网站/
+通用简历网站/*
+!通用简历网站/index.html
+!通用简历网站/.gitignore
+!通用简历网站/package.json
+!通用简历网站/pnpm-lock.yaml
+!通用简历网站/src/
+!通用简历网站/src/**
