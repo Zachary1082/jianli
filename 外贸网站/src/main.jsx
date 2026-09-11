@@ -7,7 +7,8 @@ import './styles.css';
 
 // All media for this site is deployed under the site's own base path.
 // Using BASE_URL keeps the paths correct both locally and on GitHub Pages.
-const A = `${import.meta.env.BASE_URL}assets/media/`;
+const ASSET_BASE = import.meta.env.BASE_URL === '/jianli/foreign-trade/' ? '/jianli/' : import.meta.env.BASE_URL;
+const A = `${ASSET_BASE}assets/media/`;
 
 const experiences = [
   {
@@ -63,13 +64,13 @@ function App() {
     <header className="nav"><button type="button" className="brand" onClick={() => navigateTo('top')}>张峻豪 <span>/</span> GLOBAL TRADE</button><nav><button type="button" className={activeNav === 'experience' ? 'is-current' : ''} onClick={() => navigateTo('experience')}>经历</button><button type="button" className={activeNav === 'capability' ? 'is-current' : ''} onClick={() => navigateTo('capability')}>能力</button><button type="button" className={activeNav === 'contact' ? 'is-current' : ''} onClick={() => navigateTo('contact')}>联系我</button><button type="button" className="nav-cta" onClick={() => navigateTo('contact')}>获取简历 <ArrowUpRight size={15}/></button></nav></header>
     <main id="top">
       <section className="hero">
-        <div className="hero-video"><img src={`${A}profile-stage.jpg`} alt="张峻豪" /></div><div className="hero-fade"/><div className="world-lines"/>
+        <div className="hero-video"><img src={`${A}stage-portrait.jpg`} alt="张峻豪" /></div><div className="hero-fade"/><div className="world-lines"/>
         <div className="hero-copy"><p className="eyebrow"><Globe2 size={15}/> GLOBAL MARKET / TRADE CANDIDATE</p><h1>懂市场，<br/><em>也能把增长落地。</em></h1><p className="hero-desc">面向海外市场与外贸拓展岗位。<br/>以双语沟通、增长实践和业务分析，连接市场机会与可验证的结果。</p><div className="hero-actions"><a href="#experience">查看跨境经历 <ArrowUpRight size={17}/></a><span>深圳 / 香港 · 可快速到岗</span></div></div>
         <aside className="trade-card"><div className="card-top"><span className="live-dot"/> AVAILABLE FOR GLOBAL TRADE</div><h2>张峻豪</h2><p>GLOBAL MARKET<br/>&amp; TRADE CANDIDATE</p><div className="card-rule"/><div className="card-data"><span>LANGUAGE</span><strong>CN / EN</strong><span>ENGLISH</span><strong>IELTS 6.5</strong><span>LOCATION</span><strong>SHENZHEN · HONG KONG</strong></div></aside>
         <div className="hero-bottom"><span>MARKET ENTRY</span><span>SEO GROWTH</span><span>CROSS-CULTURAL COLLABORATION</span><span>BUSINESS ANALYSIS</span></div>
       </section>
 
-      <section className="section profile" id="experience"><p className="section-number">01 / PROFILE</p><div className="profile-grid"><div><p className="eyebrow">WHY GLOBAL TRADE</p><h2>把市场信息，<br/><em>变成增长动作。</em></h2><p className="body-copy">香港浸会大学商业管理硕士，全英授课背景。拥有跨境市场营销、AI 产品和用户增长实践；习惯从用户、渠道与数据中识别问题，再通过内容、协作和复盘将方案推向结果。</p><div className="quick-facts"><span><Languages size={18}/> 英文作为日常工作语言</span><span><Send size={18}/> 10+ 场跨境活动执行</span><span><TrendingUp size={18}/> Leads 增长 40%</span></div></div><div className="profile-image"><img src={`${A}profile-stage.jpg`} alt="张峻豪在活动现场"/><div><b>2027</b><span>GRADUATE<br/>CANDIDATE</span></div></div></div></section>
+      <section className="section profile" id="experience"><p className="section-number">01 / PROFILE</p><div className="profile-grid"><div><p className="eyebrow">WHY GLOBAL TRADE</p><h2>把市场信息，<br/><em>变成增长动作。</em></h2><p className="body-copy">香港浸会大学商业管理硕士，全英授课背景。拥有跨境市场营销、AI 产品和用户增长实践；习惯从用户、渠道与数据中识别问题，再通过内容、协作和复盘将方案推向结果。</p><div className="quick-facts"><span><Languages size={18}/> 英文作为日常工作语言</span><span><Send size={18}/> 10+ 场跨境活动执行</span><span><TrendingUp size={18}/> Leads 增长 40%</span></div></div><div className="profile-image"><img src={`${A}stage-portrait.jpg`} alt="张峻豪证件照"/><div><b>2027</b><span>GRADUATE<br/>CANDIDATE</span></div></div></div></section>
 
       <section className="section experience"><p className="section-number">02 / EXPERIENCE</p><div className="section-heading"><div><p className="eyebrow">PROOF OF EXECUTION</p><h2>跨境增长不是概念，<br/><em>是可以复盘的结果。</em></h2></div><p>选择一段经历，查看我在市场、协作和结果上的具体投入。</p></div><div className="experience-shell"><aside className="experience-tabs">{experiences.map((item, index) => <button key={item.id} className={index === active ? 'active' : ''} onClick={() => setActive(index)}><small>{item.number}</small><strong>{item.english}</strong><span>{item.role}</span><ArrowUpRight size={17}/></button>)}</aside><article className="experience-detail" key={selected.id}><div className="detail-meta"><span>{selected.number} / {selected.period}</span><span>{selected.english}</span></div><h3>{selected.company}</h3><strong className="detail-role">{selected.role}</strong><p className="detail-lead">{selected.lead}</p><ul>{selected.bullets.map(x => <li key={x}>{x}</li>)}</ul><div className="metrics">{selected.metrics.map(([v, l]) => <div key={l}><b>{v}</b><span>{l}</span></div>)}</div></article></div></section>
 
