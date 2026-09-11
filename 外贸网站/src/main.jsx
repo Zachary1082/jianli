@@ -5,9 +5,9 @@ import Grainient from './Grainient/Grainient/Grainient';
 import BorderGlow from './BorderGlow';
 import './styles.css';
 
-const A = import.meta.env.BASE_URL === '/jianli/foreign-trade/'
-  ? '/jianli/assets/media/'
-  : `${import.meta.env.BASE_URL}assets/media/`;
+// All media for this site is deployed under the site's own base path.
+// Using BASE_URL keeps the paths correct both locally and on GitHub Pages.
+const A = `${import.meta.env.BASE_URL}assets/media/`;
 
 const experiences = [
   {
