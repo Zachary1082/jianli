@@ -5,9 +5,9 @@ import Grainient from './Grainient/Grainient/Grainient';
 import BorderGlow from './BorderGlow';
 import './styles.css';
 
-// Keep assets relative to this site route. This works both in local Vite
-// previews and when the site is mounted at /jianli/foreign-trade/ on GitHub Pages.
-const A = './assets/media/';
+// Vite injects the correct deployment base during the GitHub Pages build
+// (/jianli/foreign-trade/), while local development falls back to '/'.
+const A = `${import.meta.env.BASE_URL}assets/media/`;
 
 const experiences = [
   {
