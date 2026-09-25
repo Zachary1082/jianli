@@ -81,6 +81,41 @@ const workBadges = [
   { company: '趣丸科技', short: 'QUWAN · TT', role: '产品经理实习生', period: '2023', tone: 'quwan', en: { company: 'Quwan · TT Voice', role: 'Product Manager Intern' } },
 ];
 
+const businessVentures = [
+  {
+    period: '2023.12—2024.02',
+    title: '蒙牛牧家智能云柜 · 澳门校园推广',
+    role: '澳门分区项目代理人',
+    summary: '对接澳门高校，推动智能云柜进入校园，并参与落地后的运营协调。',
+    actions: ['调研师生使用需求，制定校园推广方案', '与校方商谈合作和产品引入', '跟进日常运营、技术维护与财务结算'],
+    en: { title: 'Mengniu Smart Cabinet · Macau Campus Rollout', role: 'Macau Project Agent', summary: 'Worked with Macau universities to introduce smart cabinets to campus and coordinate operations after launch.', actions: ['Researched student and staff needs and planned campus promotion', 'Discussed partnerships and deployment with universities', 'Coordinated operations, technical support and financial settlement'] },
+  },
+  {
+    period: '2024.03—2024.05',
+    title: '美团共享充电宝 · 投入与运营',
+    role: '项目投资者 / 经销商',
+    summary: '投入资源采购并投放 30 余台充电宝设备，依据需求和运营数据调整点位经营策略。',
+    actions: ['调研使用场景与潜在需求，测算营收', '负责资金筹备、设备采购与投放', '监控日常运营数据并调整策略'],
+    en: { title: 'Meituan Power Banks · Investment & Operations', role: 'Investor / Distributor', summary: 'Funded, purchased and deployed more than 30 power-bank units, using demand and operating data to refine the approach.', actions: ['Researched usage scenarios and estimated revenue', 'Prepared funding, purchased equipment and managed deployment', 'Monitored operating data and adjusted the strategy'] },
+  },
+  {
+    period: '2023—2024',
+    title: '商业竞赛知识产品 · 开发与线上运营',
+    role: '独立策划 / 运营',
+    summary: '把分散的商赛资料整理成分层的数字产品，建立从内容获客、咨询销售到交付迭代的流程。',
+    actions: ['分析备赛痛点，整理案例、模板和答辩资料', '设计资料组合、定价与线上推广内容', '处理用户咨询、交付和反馈，持续更新产品'],
+    en: { title: 'Business Competition Knowledge Products', role: 'Independent Creator / Operator', summary: 'Turned scattered competition resources into structured digital products and built a process from content discovery to sales, delivery and iteration.', actions: ['Researched preparation needs and organised cases, templates and pitch materials', 'Designed product bundles, pricing and online content', 'Managed enquiries, delivery and feedback to update the products'] },
+  },
+  {
+    period: '2023—2024',
+    title: '澳门跨境商品海淘与代购',
+    role: '独立运营',
+    summary: '面向澳门及内地高校学生，独立完成选品、跨渠道比价、采购、订单履约和售后服务。',
+    actions: ['依据价格差和客户需求筛选商品', '通过社群和熟人推荐获客，提供一对一咨询', '核算采购与物流成本，管理订单和交付'],
+    en: { title: 'Macau Cross-border Shopping & Resale', role: 'Independent Operator', summary: 'Served students in Macau and mainland China, managing product selection, price comparison, procurement, order fulfilment and after-sales support.', actions: ['Selected products based on price differences and customer needs', 'Reached customers through communities and referrals, with one-to-one advice', 'Tracked procurement and delivery costs, orders and fulfilment'] },
+  },
+];
+
 const roleFits = [
   {
     id: 'business',
@@ -131,23 +166,25 @@ const productLabs = [
 
 const ui = {
   zh: {
-    nav: [['经历', 'experience'], ['项目', 'projects'], ['优势', 'strengths']], contact: '联系我', language: 'EN', brand: '27届应届毕业生',
+    nav: [['经历', 'experience'], ['商业经历', 'business'], ['项目', 'projects'], ['优势', 'strengths']], contact: '联系我', language: 'EN', brand: '27届应届毕业生',
     heroEyebrow: 'ZHANG JUNHAO / PERSONAL RESUME', heroLine1: '把想法，', heroLine2: '推到结果。', heroDesc1: '香港浸会大学商业管理硕士', heroDesc2: '产品 · 增长 · 跨境协作 · 项目推进', quick: '快速了解我', candidate: '2027届应届毕业生', status: '深圳 / 香港 · 已获 IANG',
     experienceLabel: '01 / 个人经历', about: '关于我 / ABOUT', aboutTitle1: '跨文化、跨职能，', aboutTitle2: '也跨过从 0 到 1。', aboutText: '我是张峻豪，27届应届毕业生。香港浸会大学商业管理硕士，拥有 AI 产品、跨境营销与用户运营的复合实践，习惯在不确定中拆解问题、组织协作，并把想法推进到可验证的结果。',
     availability: ['27届应届毕业生', '意向城市：深圳 / 香港', '已获得香港 IANG 签证', '已完成课程，可快速到岗'], workKicker: 'WORK EXPERIENCE / 实习经历', workTitle1: '用结果说明', workTitle2: '我做过什么。', workHint: '悬浮工牌即可切换对应经历；点击右侧经历可继续查看职责、方法和完整交付。', badgeAlt: '张峻豪证件照',
     stats: [['3', '产品与市场实习'], ['3', '完整创业项目'], ['3', '核心竞赛成果'], ['6.5', 'IELTS / 英语工作能力']],
     careerKicker: 'CAREER MAP / 01—05', careerTitle1: '每一次经历，', careerTitle2: '都在靠近“经营全局”。', career: [['2025—26', '商业管理硕士 · 香港浸会大学', 'GPA 3.54 / 4.00 · 前 10% · 全英授课'], ['2024—25', '金山西山居 · AI 产品实习', '推动 AI 产品从 0 到 1，完成 10+ 次需求访谈与 10+ 轮测试。'], ['2023—24', '新东方 · 跨境市场营销实习', '执行 10+ 场跨境活动，带来 Leads 增长 40%。'], ['2023', '趣丸科技 · TT 语音产品实习', '推动活跃提升 24%，累计触达 10W+ 用户。'], ['2022—26', '项目 / 竞赛 / 领导力', '3 个从 0 到 1 项目 · 省级竞赛奖项 · 多次团队路演。']],
+    businessLabel: '商业经历 / 创业实践', businessKicker: 'BUSINESS EXPERIENCE', businessTitle1: '从发现机会，', businessTitle2: '到亲手经营。', businessIntro: '四段亲自参与的商业实践，覆盖校园渠道、设备投入、数字产品与跨境零售；从需求判断到运营交付，完整接触业务的关键环节。', businessActions: '我做了什么',
     projectLabel: '02 / INTERACTIVE PRODUCT LAB', projectTitle1: '不只看界面，', projectTitle2: '直接体验产品。', projectIntro: '选择项目并点击中间的手机，即可像真实 App 一样操作；按 ESC 随时退出交互。', choose: '选择一个项目，进入真实原型', live: '正在展示', switch: '点击切换', result: '项目结果', myRole: '我的职责', caseButton: '查看完整案例', enter: '点击进入产品', enterHint: '可直接点击、滑动与填写', exit: '退出交互', path: '建议体验路径', tip: '操作提示', tipText: '进入交互后，页面滚动将优先留在手机内；退出后可继续浏览简历。',
     strengthsLabel: '03 / 个人优势', strengthsKicker: 'WHY ME / 复合型能力', strengthsTitle1: '既能看全局，', strengthsTitle2: '也能把事情做完。', strengthsIntro: '我的优势不是单一技能，而是把产品、数据、商业判断和团队协作连接成完整的推进链路。',
     contactLead: '期待和下一支团队，', contactTitle: '把值得做的事做成。', contactNote: '27届应届毕业生 · 已完成课程 · 可快速到岗', scan: '扫码添加微信', scanHint: '请备注“招聘 / 公司名称”', footerRole: '张峻豪 / 个人履历', close: '关闭', responsibility: '我的职责', projectResult: '项目结果', emailCopied: '邮箱已复制', phoneCopied: '电话号码已复制', copyEmail: '复制邮箱', copyPhone: '复制电话号码'
   },
   en: {
-    nav: [['Experience', 'experience'], ['Projects', 'projects'], ['Strengths', 'strengths']], contact: 'Contact', language: '中', brand: 'Class of 2027',
+    nav: [['Experience', 'experience'], ['Business', 'business'], ['Projects', 'projects'], ['Strengths', 'strengths']], contact: 'Contact', language: '中', brand: 'Class of 2027',
     heroEyebrow: 'ZHANG JUNHAO / PERSONAL RESUME', heroLine1: 'Ideas into', heroLine2: 'outcomes.', heroDesc1: 'MSc in Business Management · Hong Kong Baptist University', heroDesc2: 'Product · Growth · Cross-border Collaboration · Execution', quick: 'Quick Profile', candidate: 'Class of 2027 Graduate', status: 'Shenzhen / Hong Kong · IANG Granted',
     experienceLabel: '01 / EXPERIENCE', about: 'ABOUT ME', aboutTitle1: 'Cross-cultural. Cross-functional.', aboutTitle2: 'From zero to one.', aboutText: 'I am Junhao Zhang, a Class of 2027 graduate with an MSc in Business Management from Hong Kong Baptist University. My experience spans AI products, cross-border marketing and user operations. I thrive in ambiguity—breaking down problems, aligning teams and moving ideas towards measurable outcomes.',
     availability: ['Class of 2027', 'Preferred: Shenzhen / Hong Kong', 'Hong Kong IANG visa granted', 'Coursework completed · Available soon'], workKicker: 'WORK EXPERIENCE', workTitle1: 'What I did,', workTitle2: 'proved by outcomes.', workHint: 'Hover over a badge to switch roles. Select an experience to review ownership, approach and delivery.', badgeAlt: 'Junhao Zhang portrait',
     stats: [['3', 'Product & marketing internships'], ['3', 'End-to-end venture projects'], ['3', 'Major competition results'], ['6.5', 'IELTS · Working English']],
     careerKicker: 'CAREER MAP / 01—05', careerTitle1: 'Every experience', careerTitle2: 'builds a broader business view.', career: [['2025—26', 'MSc Business Management · HKBU', 'GPA 3.54 / 4.00 · Top 10% · English-taught'], ['2024—25', 'Kingsoft Seasun · AI Product', 'Took an AI module from zero to launch through 10+ interviews and 10+ test rounds.'], ['2023—24', 'New Oriental · Cross-border Marketing', 'Ran 10+ campaigns and delivered 40% lead growth.'], ['2023', 'Quwan · TT Voice Product', 'Lifted feature usage by 24% and reached 100K+ core users.'], ['2022—26', 'Projects · Competitions · Leadership', 'Three 0-to-1 products · Provincial award · Multiple team pitches.']],
+    businessLabel: 'BUSINESS EXPERIENCE / VENTURES', businessKicker: 'BUSINESS EXPERIENCE', businessTitle1: 'Spot the opportunity.', businessTitle2: 'Run the operation.', businessIntro: 'Four hands-on ventures across campus distribution, equipment investment, digital products and cross-border retail. Each involved real decisions about demand, channels and delivery.', businessActions: 'What I did',
     projectLabel: '02 / INTERACTIVE PRODUCT LAB', projectTitle1: 'Beyond screenshots.', projectTitle2: 'Try the products.', projectIntro: 'Choose a project and select the phone to use it like a real app. Press ESC at any time to exit.', choose: 'Choose a project and enter the live prototype', live: 'Now showing', switch: 'Switch project', result: 'PROJECT RESULT', myRole: 'My role', caseButton: 'View full case', enter: 'Enter product', enterHint: 'Click, scroll and complete flows', exit: 'Exit', path: 'Suggested journey', tip: 'How to interact', tipText: 'While interacting, scrolling stays inside the phone. Exit to continue browsing the résumé.',
     strengthsLabel: '03 / STRENGTHS', strengthsKicker: 'WHY ME / CONNECTED CAPABILITIES', strengthsTitle1: 'See the whole picture.', strengthsTitle2: 'Finish what matters.', strengthsIntro: 'My advantage is not one isolated skill, but the ability to connect product thinking, data, business judgement and teamwork into one delivery chain.',
     contactLead: 'Ready for the next team', contactTitle: 'and the next meaningful outcome.', contactNote: 'Class of 2027 · Coursework completed · Available soon', scan: 'Scan to add me on WeChat', scanHint: 'Please mention “Recruitment / Company”', footerRole: 'Junhao Zhang / Personal Resume', close: 'Close', responsibility: 'My role', projectResult: 'Project result', emailCopied: 'Email copied', phoneCopied: 'Phone number copied', copyEmail: 'Copy email', copyPhone: 'Copy phone number'
@@ -207,6 +244,7 @@ function App() {
   const sections = sectionContent[language];
   const localizedCases = React.useMemo(() => Object.fromEntries(Object.entries(cases).map(([key, value]) => [key, localize(value, language)])), [language]);
   const localizedWork = React.useMemo(() => workExperience.map(item => localize(item, language)), [language]);
+  const localizedVentures = React.useMemo(() => businessVentures.map(item => localize(item, language)), [language]);
   const localizedBadges = React.useMemo(() => workBadges.map(item => localize(item, language)), [language]);
   const localizedFits = React.useMemo(() => roleFits.map(item => localize(item, language)), [language]);
   const localizedLabs = React.useMemo(() => productLabs.map(item => localize(item, language)), [language]);
@@ -300,8 +338,8 @@ function App() {
     const revealMap = new Map();
     [...document.querySelectorAll('.section')].forEach((section) => {
       const chapter = section.querySelector('.motion-chapter');
-      const heading = section.querySelector('.intro-text h2,.section-head h2,.strength-intro h2,.contact-main h2');
-      const copy = section.querySelector('.intro-text>p:last-of-type,.section-head>p,.strength-intro>p,.contact-note');
+      const heading = section.querySelector('.intro-text h2,.section-head h2,.business-intro h2,.strength-intro h2,.contact-main h2');
+      const copy = section.querySelector('.intro-text>p:last-of-type,.section-head>p,.business-intro>p:last-child,.strength-intro>p,.contact-note');
       const media = section.id === 'experience' ? [...section.querySelectorAll('.portrait-wrap')] : [];
       [chapter, heading, copy, ...media].filter(Boolean).forEach((item) => { item.style.opacity = '0'; });
       revealMap.set(section, { type: 'section', chapter, heading, copy, media });
@@ -313,6 +351,7 @@ function App() {
       ['.career-map', ':scope>*'],
       ['.education-grid', ':scope>*'],
       ['.proof-grid', ':scope>*'],
+      ['.business-grid', ':scope>*'],
       ['.project-grid', '.project'],
       ['.strength-cards', '.strength-card'],
       ['.contact-panel', ':scope'],
@@ -480,6 +519,13 @@ function App() {
         <div className="education-grid"><BorderGlow><article><img className="education-emblem emblem-hkbu" src={`${M}hkbu-emblem-round.png`} alt={sections.education[0].school} loading="lazy" /><p className="kicker">EDUCATION / 01</p><span>{sections.education[0].location}</span><h3>{sections.education[0].school} <em>{sections.education[0].badge}</em></h3><strong>{sections.education[0].degree}</strong><p>{sections.education[0].detail}</p></article></BorderGlow><BorderGlow><article><img className="education-emblem emblem-must" src={`${M}must-emblem.svg`} alt={sections.education[1].school} loading="lazy" /><p className="kicker">EDUCATION / 02</p><span>{sections.education[1].location}</span><h3>{sections.education[1].school} <em>{sections.education[1].badge}</em></h3><strong>{sections.education[1].degree}</strong><p>{sections.education[1].detail}</p></article></BorderGlow><BorderGlow><aside><p className="kicker">TOOLS / CERTIFICATES</p><div>{sections.tools.map(tool => <span key={tool}>{tool}</span>)}</div></aside></BorderGlow></div>
         <div className="proof-grid"><BorderGlow><article><p className="kicker">SELECTED HONORS</p><h3>{sections.honorsTitle}</h3><ul>{sections.honors.map(item => <li key={item}>{item}</li>)}</ul></article></BorderGlow><BorderGlow><article><p className="kicker">LEADERSHIP</p><h3>{sections.leadershipTitle}</h3><ul>{sections.leadership.map(item => <li key={item}>{item}</li>)}</ul></article></BorderGlow></div>
         <BorderGlow><section className="interest-panel" aria-labelledby="interest-title"><div className="interest-intro"><p className="kicker">{sections.interestKicker}</p><h3 id="interest-title">{sections.interestTitle1}<br /><span>{sections.interestTitle2}</span></h3><p>{sections.interestIntro}</p></div><div className="interest-list">{sections.interests.map(([title, text], index) => <article key={title}><div className="interest-icon">{index === 0 ? <BasketballIcon /> : index === 1 ? <Bike size={29} /> : <Camera size={29} />}</div><span>{['01 / TEAM', '02 / ENDURANCE', '03 / OBSERVE'][index]}</span><h4>{title}</h4><p>{text}</p></article>)}</div></section></BorderGlow>
+      </section>
+
+      <section className="business section" id="business" aria-labelledby="business-title">
+        <div className="motion-chapter" aria-hidden="true">BUSINESS</div>
+        <div className="section-label">{copy.businessLabel}</div>
+        <div className="business-intro"><div><p className="kicker">{copy.businessKicker}</p><h2 id="business-title">{copy.businessTitle1}<br /><span>{copy.businessTitle2}</span></h2></div><p>{copy.businessIntro}</p></div>
+        <div className="business-grid">{localizedVentures.map((venture, index) => <BorderGlow key={venture.title}><article className="business-card"><div className="business-card-top"><span>0{index + 1} / 04</span><time>{venture.period}</time></div><h3>{venture.title}</h3><p className="business-role">{venture.role}</p><p className="business-summary">{venture.summary}</p><div className="business-actions"><strong>{copy.businessActions}</strong><ul>{venture.actions.map(action => <li key={action}>{action}</li>)}</ul></div></article></BorderGlow>)}</div>
       </section>
 
       <section className="projects section" id="projects">
