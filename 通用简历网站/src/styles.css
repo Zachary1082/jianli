@@ -575,10 +575,9 @@
 .site .lab-role{color:#d5dde7;font-size:12px;line-height:1.7}
 .site .lab-case-button{display:inline-flex;align-items:center;gap:9px;margin-top:24px;padding:12px 16px;border:1px solid #ffffff2b;border-radius:999px;background:transparent;color:#f0eee9;font-size:12px;cursor:pointer;transition:background .3s ease,color .3s ease,border-color .3s ease,transform .3s ease}
 .site .lab-case-button:hover{background:#e3c17f;color:#07101d;border-color:#e3c17f;transform:translateY(-2px)}
-.site .lab-stage{grid-area:stage;position:relative;z-index:2;height:clamp(650px,73vh,800px);min-width:0;border:1px solid #ffffff24;border-radius:28px;background:#050a13;overflow:hidden;box-shadow:0 28px 80px #0009,0 0 0 8px #ffffff05;transform:rotate(-.55deg);transform-origin:center 54%;transition:border-color .35s ease,box-shadow .35s ease,transform .65s cubic-bezier(.22,1,.36,1);animation:lab-stage-reveal .85s cubic-bezier(.22,1,.36,1) both}
-@keyframes lab-stage-reveal{from{opacity:0;transform:translateY(45px) scale(.955) rotate(-2deg)}to{opacity:1;transform:rotate(-.55deg)}}
-.site .lab-stage:hover{transform:translateY(-4px) rotate(0)}
-.site .lab-stage.is-interacting{border-color:color-mix(in srgb,var(--lab-accent) 72%,white);box-shadow:0 34px 95px #000b,0 0 0 8px color-mix(in srgb,var(--lab-accent) 13%,transparent);transform:translateY(-4px) rotate(0)}
+.site .lab-stage{grid-area:stage;position:relative;z-index:2;height:clamp(650px,73vh,800px);min-width:0;border:1px solid #ffffff24;border-radius:28px;background:#050a13;overflow:hidden;box-shadow:0 28px 80px #0009,0 0 0 8px #ffffff05;transition:border-color .35s ease,box-shadow .35s ease;animation:lab-stage-reveal .85s cubic-bezier(.22,1,.36,1) both}
+@keyframes lab-stage-reveal{from{opacity:0;transform:translateY(45px) scale(.955)}to{opacity:1;transform:none}}
+.site .lab-stage.is-interacting{border-color:color-mix(in srgb,var(--lab-accent) 72%,white);box-shadow:0 34px 95px #000b,0 0 0 8px color-mix(in srgb,var(--lab-accent) 13%,transparent)}
 .site .lab-stage-head{position:absolute;z-index:4;left:0;right:0;top:0;height:42px;padding:0 15px;display:flex;align-items:center;justify-content:space-between;background:#06111be8;border-bottom:1px solid #ffffff12;color:#8291a6;backdrop-filter:blur(12px)}
 .site .lab-stage-head span{display:flex;align-items:center;gap:7px;font:8px 'DM Mono',monospace;letter-spacing:.12em}
 .site .lab-stage-head i{width:6px;height:6px;border-radius:50%;background:#6ce09a;box-shadow:0 0 11px #6ce09a}

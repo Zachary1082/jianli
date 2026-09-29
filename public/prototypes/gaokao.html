@@ -13,12 +13,13 @@
 </head>
 <body class="m-0 bg-[#e9eaed] font-sans text-slate-900 antialiased">
   <style>
-    html, body { width: 100%; min-height: 100%; }
+    html, body { width: 100%; height: 100%; }
     body {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 32px 16px;
+      overflow: hidden;
+      padding: 0;
       box-sizing: border-box;
     }
     .iphone-stage {
@@ -26,6 +27,8 @@
       height: 876px;
       position: relative;
       flex: 0 0 auto;
+      transform: scale(var(--iphone-scale, 1));
+      transform-origin: center center;
     }
     .iphone-device {
       width: 417px;
@@ -151,18 +154,6 @@
       background: rgba(10,10,10,.82);
       pointer-events: none;
       mix-blend-mode: multiply;
-    }
-    @media (max-width: 460px), (max-height: 930px) {
-      body { padding: 10px; }
-      .iphone-stage {
-        --scale: min(calc((100vw - 20px) / 417), calc((100vh - 20px) / 876));
-        width: calc(417px * var(--scale));
-        height: calc(876px * var(--scale));
-      }
-      .iphone-device {
-        transform: scale(var(--scale));
-        transform-origin: top left;
-      }
     }
   </style>
 
@@ -788,6 +779,15 @@
   }catch(e){}
   renderProfile();
   lucide.createIcons();
+</script>
+<script>
+  // Keep the same physical phone size and fit margin as iCare and SkillShare.
+  function fitIPhonePrototype() {
+    const scale = Math.min(1, (window.innerWidth - 28) / 417, (window.innerHeight - 28) / 876);
+    document.documentElement.style.setProperty('--iphone-scale', Math.max(0.35, scale).toFixed(4));
+  }
+  fitIPhonePrototype();
+  window.addEventListener('resize', fitIPhonePrototype);
 </script>
 </body>
 </html>

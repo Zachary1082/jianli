@@ -67,13 +67,17 @@
             border: 12px solid #2d2d2d;
             border-radius: 50px;
             overflow: hidden;
-            height: 100vh;
-            max-height: 850px;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
+            box-sizing: border-box;
+            width: 417px;
+            height: 876px;
+            max-width: none;
+            max-height: none;
+            flex: 0 0 auto;
+            margin: 0;
             position: relative;
             background: #F8F9FA;
+            transform: scale(var(--iphone-scale, 1));
+            transform-origin: center center;
         }
         .active-scale:active { transform: scale(0.95); transition: transform 0.1s; }
         
@@ -94,7 +98,7 @@
         .rich-text ul { list-style-type: disc; padding-left: 1.2rem; margin-bottom: 1rem; color: #555; font-size: 0.9rem; }
     </style>
 </head>
-<body class="bg-white min-h-screen flex items-center justify-center py-2 font-sans text-gray-800">
+<body class="bg-white h-screen w-screen overflow-hidden flex items-center justify-center font-sans text-gray-800">
 
     <div class="iphone-frame" x-data="appData()" x-cloak>
 
@@ -675,6 +679,15 @@
                 sendMessage() { if (!this.chatInput.trim()) return; const text = this.chatInput; const now = new Date(); const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`; this.chatMessages.push({ text: text, isMe: true, time: timeStr }); this.chatInput = ''; this.$nextTick(() => { document.getElementById('chatContainer').scrollTop = 9999; }); setTimeout(() => { this.chatMessages.push({ isTyping: true, isMe: false }); this.$nextTick(() => { document.getElementById('chatContainer').scrollTop = 9999; }); setTimeout(() => { this.chatMessages.pop(); this.chatMessages.push({ text: "好呀，具体什么时候？", isMe: false, time: timeStr }); this.$nextTick(() => { document.getElementById('chatContainer').scrollTop = 9999; }); }, 1500); }, 600); }
             }
         }
+    </script>
+    <script>
+        // Match the 417 × 876 phone viewport used by the other two prototypes.
+        function fitIPhonePrototype() {
+            const scale = Math.min(1, (window.innerWidth - 28) / 417, (window.innerHeight - 28) / 876);
+            document.documentElement.style.setProperty('--iphone-scale', Math.max(0.35, scale).toFixed(4));
+        }
+        fitIPhonePrototype();
+        window.addEventListener('resize', fitIPhonePrototype);
     </script>
 </body>
 </html>
