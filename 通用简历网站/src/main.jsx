@@ -197,33 +197,43 @@ const sectionContent = {
   zh: {
     education: [
       { location: '香港 · 已毕业 / 11 月领取毕业证', school: '香港浸会大学', badge: '纯英授课', degree: '商业管理硕士 · GPA 3.54 / 4.00 · 前 5%', detail: '创业与创新企业发展、数字化转型、商业数据分析、高级管理市场营销；全英授课。' },
-      { location: '澳门 · 2021—2025', school: '澳门科技大学', badge: '纯英授课', degree: '工商管理学士 · GPA 排名前 10%', detail: '管理、市场营销、财务管理、组织行为与战略管理；篮球社、音乐协会宣传部负责人。' }
+      { location: '澳门 · 2021—2025', school: '澳门科技大学', badge: '纯英授课', degree: '工商管理学士 · GPA 排名前 10%', detail: '管理、市场营销、财务管理、组织行为与战略管理；曾任篮球社社长、音乐协会宣传部部长。' }
     ],
     tools: ['IELTS 6.5', '阿里云 SQL', 'Excel / 数据看板', 'Axure / 墨刀 / Figma', 'Coze / Dify / DeepSeek', 'PRD / MRD'],
     honorsTitle: '用赛事检验方案', honors: ['CTF Life 香港商赛第四名 / 150+ 队伍', '全国大学生电子商务“三创赛”省级银奖', 'SkillShare BUS 课程满分 / HSITP 优秀项目路演'],
-    leadershipTitle: '把团队带到结果', leadership: ['3 次担任项目负责人，统筹产品、商业与路演交付', '澳门科技大学篮球社部长，三届校际赛累计吸引 300+ 人', '音乐协会宣传部部长，参与千人级活动传播与组织'],
+    leadershipTitle: '把团队带到结果', leadership: ['3 次担任项目负责人，统筹产品、商业与路演交付', '篮球社社长，三届校区篮球赛累计吸引 300+ 人', '音乐协会宣传部部长，两届歌手大赛累计吸引 5000+ 观众'],
+    campusKicker: 'CAMPUS LEADERSHIP / 社团经历', campusTitle: '在校园里，练习把团队和活动带到现场。', campusIntro: '从赛事运营、内容传播到赞助合作与成员培养，两段社团经历让我持续练习组织和交付。',
+    campusActivities: [
+      { period: '2022.10.01—2023.10.01', name: '篮球社', role: '社长', metrics: ['3 届篮球赛 · 300+ 人参与', '10+ 篇推送 · UV 5000+', '每届赞助 ¥5000+'], actions: ['组织筹备三届校区篮球赛，建立可持续复用的赛事运营流程。', '运营公众号，摄影并设计宣传海报；在校方公众号发布 10 余篇内容，累计 UV 5000+。', '对接长期合作赞助商，为每届球赛争取稳定的人民币 5000 元以上赞助。'] },
+      { period: '2023.10.28—2024.09.01', name: '音乐协会', role: '宣传部部长', metrics: ['2 届歌手大赛 · 100+ 名选手', '5000+ 名观众 · 应收 ¥5万+', '招新 50+ 人'], actions: ['参与筹备及管理两届校园歌手大赛，宣传招募 100 余名参赛选手，累计吸引 5000 余名观众。', '拍摄、剪辑活动素材，使用 Photoshop 等工具制作赛事宣传海报；活动应收超过人民币 5 万元。', '统筹社团招新，吸纳 50 余名新成员，支持协会后续活动的人才培养。'] }
+    ],
     interestKicker: 'BEYOND WORK / 工作之外', interestTitle1: '保持热爱，', interestTitle2: '也保持感知。', interestIntro: '兴趣让我在工作之外持续练习协作、耐力与观察。', interests: [['篮球', '团队协作 · 竞技意识'], ['骑行', '耐力积累 · 目标感'], ['摄影', '观察细节 · 审美表达']],
     strengths: [
       ['01 / PRODUCT', '0—1 产品落地', '3 段产品与市场实习', '从需求访谈、竞品研究和 PRD，到跨团队交付、上线验证与迭代复盘。', '10+ PRD · 10+ 需求评审 · 3 个完整创业项目'],
       ['02 / DATA', '数据驱动增长', '>95%', '建立指标、埋点和效果评估体系，用数据定位问题并支持业务决策。', 'Leads +40% · 玩法使用率 +24%'],
       ['03 / BUSINESS', '商业化判断', 'LTV / CAC >10', '熟悉 PEST、SWOT、TAM-SAM-SOM 与财务预测，把用户价值落到商业闭环。', '香港商赛第四名 · BUS 课程满分'],
-      ['04 / LEADERSHIP', '跨文化协同', '中英双语', '能够在跨专业、跨时区和中英文语境中对齐目标，推动团队高质量交付。', '3 次项目负责人 · 学生组织部长']
+      ['04 / LEADERSHIP', '跨文化协同', '中英双语', '能够在跨专业、跨时区和中英文语境中对齐目标，推动团队高质量交付。', '3 次项目负责人 · 篮球社社长 · 音协宣传部部长']
     ]
   },
   en: {
     education: [
       { location: 'Hong Kong · Graduated / Certificate in November', school: 'Hong Kong Baptist University', badge: 'English-taught', degree: 'MSc Business Management · GPA 3.54 / 4.00 · Top 5%', detail: 'Entrepreneurship, digital transformation, business analytics and advanced marketing management.' },
-      { location: 'Macao · 2021—2025', school: 'Macau University of Science and Technology', badge: 'English-taught', degree: 'BBA · Top 10% by GPA', detail: 'Management, marketing, finance, organisational behaviour and strategy; leadership roles in basketball and music societies.' }
+      { location: 'Macao · 2021—2025', school: 'Macau University of Science and Technology', badge: 'English-taught', degree: 'BBA · Top 10% by GPA', detail: 'Management, marketing, finance, organisational behaviour and strategy; President of the Basketball Society and Publicity Director of the Music Association.' }
     ],
     tools: ['IELTS 6.5', 'Alibaba Cloud SQL', 'Excel / Dashboards', 'Axure / Mockitt / Figma', 'Coze / Dify / DeepSeek', 'PRD / MRD'],
     honorsTitle: 'Testing ideas through competition', honors: ['4th place · CTF Life Hong Kong Business Competition / 150+ teams', 'Provincial Silver · National E-commerce Innovation Competition', 'Full marks in BUS · HSITP outstanding project pitch'],
-    leadershipTitle: 'Leading teams to outcomes', leadership: ['Led three projects across product, business and pitch delivery', 'Basketball Society lead; attracted 300+ participants across three tournaments', 'Music Association publicity lead; supported events with 1,000+ attendees'],
+    leadershipTitle: 'Leading teams to outcomes', leadership: ['Led three projects across product, business and pitch delivery', 'Basketball Society President; 300+ participants across three campus tournaments', 'Music Association Publicity Director; 5,000+ spectators across two singing contests'],
+    campusKicker: 'CAMPUS LEADERSHIP', campusTitle: 'Building teams and experiences on campus.', campusIntro: 'Two student leadership roles spanning event operations, content, sponsorship and member development.',
+    campusActivities: [
+      { period: '1 Oct 2022—1 Oct 2023', name: 'Basketball Society', role: 'President', metrics: ['3 tournaments · 300+ participants', '10+ posts · 5,000+ UV', '¥5,000+ sponsorship per event'], actions: ['Organised three campus basketball tournaments and established a repeatable operating process.', 'Managed the society’s social content, photography and posters; published 10+ posts through the university account with 5,000+ cumulative unique views.', 'Built lasting sponsor relationships and secured over RMB 5,000 in sponsorship for each tournament.'] },
+      { period: '28 Oct 2023—1 Sep 2024', name: 'Music Association', role: 'Publicity Director', metrics: ['2 contests · 100+ contestants', '5,000+ spectators · ¥50,000+ receivables', '50+ new members'], actions: ['Helped organise two campus singing contests, recruiting 100+ contestants and reaching 5,000+ spectators in total.', 'Photographed and edited event materials and designed posters with Photoshop; the events generated over RMB 50,000 in receivables.', 'Coordinated recruitment of 50+ new members and supported the next generation of the association.'] }
+    ],
     interestKicker: 'BEYOND WORK', interestTitle1: 'Stay curious.', interestTitle2: 'Stay perceptive.', interestIntro: 'Outside work, my interests keep me practising collaboration, endurance and observation.', interests: [['Basketball', 'Teamwork · Competitive mindset'], ['Cycling', 'Endurance · Goal orientation'], ['Photography', 'Observation · Visual storytelling']],
     strengths: [
       ['01 / PRODUCT', '0-to-1 Product Delivery', '3 product & marketing internships', 'From interviews, competitive research and PRDs to cross-team delivery, launch validation and iteration.', '10+ PRDs · 10+ reviews · 3 end-to-end ventures'],
       ['02 / DATA', 'Data-driven Growth', '>95%', 'Build metrics, analytics and evaluation systems to locate problems and support decisions.', 'Leads +40% · Feature usage +24%'],
       ['03 / BUSINESS', 'Commercial Judgement', 'LTV / CAC >10', 'Use market sizing, strategic frameworks and financial modelling to connect user value with viable business models.', '4th in HK competition · Full marks in BUS'],
-      ['04 / LEADERSHIP', 'Cross-cultural Collaboration', 'Bilingual', 'Align goals across disciplines, time zones and Chinese-English working environments.', '3× project lead · Student organisation leader']
+      ['04 / LEADERSHIP', 'Cross-cultural Collaboration', 'Bilingual', 'Align goals across disciplines, time zones and Chinese-English working environments.', '3× project lead · Basketball Society President · Music Publicity Director']
     ]
   }
 };
@@ -518,6 +528,7 @@ function App() {
         <div className="career-map"><div className="career-title"><span className="kicker">{copy.careerKicker}</span><h3>{copy.careerTitle1}<br /><span>{copy.careerTitle2}</span></h3></div>{copy.career.map(([year, title, text]) => <div className="career-item" key={title}><b>{year}</b><strong>{title}</strong><p>{text}</p></div>)}</div>
         <div className="education-grid"><BorderGlow><article><img className="education-emblem emblem-hkbu" src={`${M}hkbu-emblem-round.png`} alt={sections.education[0].school} loading="lazy" /><p className="kicker">EDUCATION / 01</p><span>{sections.education[0].location}</span><h3>{sections.education[0].school} <em>{sections.education[0].badge}</em></h3><strong>{sections.education[0].degree}</strong><p>{sections.education[0].detail}</p></article></BorderGlow><BorderGlow><article><img className="education-emblem emblem-must" src={`${M}must-emblem.svg`} alt={sections.education[1].school} loading="lazy" /><p className="kicker">EDUCATION / 02</p><span>{sections.education[1].location}</span><h3>{sections.education[1].school} <em>{sections.education[1].badge}</em></h3><strong>{sections.education[1].degree}</strong><p>{sections.education[1].detail}</p></article></BorderGlow><BorderGlow><aside><p className="kicker">TOOLS / CERTIFICATES</p><div>{sections.tools.map(tool => <span key={tool}>{tool}</span>)}</div></aside></BorderGlow></div>
         <div className="proof-grid"><BorderGlow><article><p className="kicker">SELECTED HONORS</p><h3>{sections.honorsTitle}</h3><ul>{sections.honors.map(item => <li key={item}>{item}</li>)}</ul></article></BorderGlow><BorderGlow><article><p className="kicker">LEADERSHIP</p><h3>{sections.leadershipTitle}</h3><ul>{sections.leadership.map(item => <li key={item}>{item}</li>)}</ul></article></BorderGlow></div>
+        <section className="campus-section" id="campus" aria-labelledby="campus-title"><div className="campus-heading"><div><p className="kicker">{sections.campusKicker}</p><h3 id="campus-title">{sections.campusTitle}</h3></div><p>{sections.campusIntro}</p></div><div className="campus-grid">{sections.campusActivities.map((activity, index) => <BorderGlow key={activity.name}><article className="campus-card"><div className="campus-card-top"><span>0{index + 1} / 02</span><time>{activity.period}</time></div><h4>{activity.name}</h4><strong className="campus-role">{activity.role}</strong><div className="campus-metrics">{activity.metrics.map(metric => <span key={metric}>{metric}</span>)}</div><ul>{activity.actions.map(action => <li key={action}>{action}</li>)}</ul></article></BorderGlow>)}</div></section>
         <BorderGlow><section className="interest-panel" aria-labelledby="interest-title"><div className="interest-intro"><p className="kicker">{sections.interestKicker}</p><h3 id="interest-title">{sections.interestTitle1}<br /><span>{sections.interestTitle2}</span></h3><p>{sections.interestIntro}</p></div><div className="interest-list">{sections.interests.map(([title, text], index) => <article key={title}><div className="interest-icon">{index === 0 ? <BasketballIcon /> : index === 1 ? <Bike size={29} /> : <Camera size={29} />}</div><span>{['01 / TEAM', '02 / ENDURANCE', '03 / OBSERVE'][index]}</span><h4>{title}</h4><p>{text}</p></article>)}</div></section></BorderGlow>
       </section>
 
